@@ -17,11 +17,19 @@ library(lhs)  # per Latin Hypercube Sampling (opzionale)
 
 # --- Parallelizzazione ---
 # Imposta il numero di core. Su server HPC, usa tutti quelli disponibili.
-N_CORES <- parallel::detectCores() - 1
-# N_CORES <- 110  # <-- decommentare e impostare manualmente per HPC
+# N_CORES <- parallel::detectCores() - 1
+N_CORES <- 110  # <-- decommentare e impostare manualmente per HPC
 
 # Inizializza il piano future (da chiamare PRIMA di ogni script)
 setup_parallel <- function(n_workers = N_CORES) {
+  # RStudio non supporta bene multicore, usa sempre multisession
+  # Se vuoi forzare multicore su server senza RStudio, decommenta sotto
+  # if (.Platform$OS.type == "unix" && !nzchar(Sys.getenv("RSTUDIO"))) {
+  #   plan(multicore, workers = n_workers)
+  # } else {
+  #   plan(multisession, workers = n_workers)
+  # }
+  
   plan(multisession, workers = n_workers)
   handlers(global = TRUE)  # abilita progress bar
   message(sprintf("Piano parallelo attivato: %d workers", n_workers))
