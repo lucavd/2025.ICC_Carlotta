@@ -14,9 +14,9 @@ args <- commandArgs(trailingOnly = TRUE)
 run_what <- if (length(args) > 0) args[1] else "all"
 
 cat("\n")
-cat("╔═══════════════════════════════════════════════════════════════╗\n")
-cat("║     ICC Simulation Study - Optimized Pipeline                 ║\n")
-cat("╚═══════════════════════════════════════════════════════════════╝\n")
+cat("================================================================\n")
+cat("     ICC Simulation Study - Optimized Pipeline                  \n")
+cat("================================================================\n")
 cat("\n")
 
 # Carica configurazione
@@ -58,9 +58,9 @@ end_time <- Sys.time()
 elapsed <- difftime(end_time, start_time, units = "hours")
 
 cat("\n")
-cat("╔═══════════════════════════════════════════════════════════════╗\n")
-cat(sprintf("║  COMPLETATO in %.2f ore                                      ║\n", as.numeric(elapsed)))
-cat("╚═══════════════════════════════════════════════════════════════╝\n")
+cat("================================================================\n")
+cat(sprintf("  COMPLETATO in %.2f ore\n", as.numeric(elapsed)))
+cat("================================================================\n")
 cat("\n")
 
 # Chiudi workers
