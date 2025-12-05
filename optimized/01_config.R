@@ -18,7 +18,7 @@ library(lhs)  # per Latin Hypercube Sampling (opzionale)
 # --- Parallelizzazione ---
 # Imposta il numero di core. Su server HPC, usa tutti quelli disponibili.
 # N_CORES <- parallel::detectCores() - 1
-N_CORES <- 110  # <-- decommentare e impostare manualmente per HPC
+N_CORES <- 110
 
 # Inizializza il piano future (da chiamare PRIMA di ogni script)
 setup_parallel <- function(n_workers = N_CORES) {
@@ -104,6 +104,7 @@ make_paper1_scenarios <- function() {
 
 PAPER2_POWER_NSIM <- 1000  # ORIGINALE: 2000
 PAPER2_POWER_CHUNK_SIZE <- 200
+PAPER2_POWER_MAX_SS_DE <- 20000  # Cap sample_size_DE: scenari oltre = non realistici
 
 # Grid ORIGINALE (2688 scenari per disegno):
 # treat_effects: 2, lambdas: 2, icc_values: 7, num_hosps: 4, sample_sizes: 4, cens: 3, balancing: 2

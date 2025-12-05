@@ -161,17 +161,10 @@ run_paper2_ss_hospital <- function() {
 # MAIN
 # =============================================================================
 
-if (interactive()) {
-  cat("\n")
-  cat("Per eseguire Paper 2 Sample Size:\n")
-  cat("  ss_ind  <- run_paper2_ss_individual()\n")
-  cat("  ss_hosp <- run_paper2_ss_hospital()\n")
-  cat("\n")
-} else {
-  ss_individual <- run_paper2_ss_individual()
-  ss_hospital   <- run_paper2_ss_hospital()
-  
-  ss_combined <- bind_rows(ss_individual, ss_hospital)
-  saveRDS(ss_combined, file.path(DIR_BASE, "paper2_SAMPLE_SIZE_ALL_RESULTS.rds"))
-  cat("\n\nTutti i risultati Paper 2 Sample Size salvati.\n")
-}
+# Esecuzione (sia da RStudio che da terminale)
+ss_individual <- run_paper2_ss_individual()
+ss_hospital   <- run_paper2_ss_hospital()
+
+ss_combined <- bind_rows(ss_individual, ss_hospital)
+saveRDS(ss_combined, file.path(DIR_BASE, "paper2_SAMPLE_SIZE_ALL_RESULTS.rds"))
+cat("\n\nTutti i risultati Paper 2 Sample Size salvati.\n")

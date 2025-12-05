@@ -97,6 +97,23 @@ process_power_DE_scenario <- function(scenario_id, scen, nsim, dir_out, simula_f
     return(NULL)
   }
   
+  # Skip se sample_size_DE supera il cap (scenario non realistico)
+  if (!is.null(scen$sample_size_DE) && scen$sample_size_DE > PAPER2_POWER_MAX_SS_DE) {
+    message(sprintf(">>> Scenario DE %d SKIPPED: sample_size_DE=%d > cap=%d (non realistico)",
+                    scenario_id, scen$sample_size_DE, PAPER2_POWER_MAX_SS_DE))
+    # Salva risultato NA per tracciabilità
+    res_skip <- tibble(
+      scenario_id = scenario_id,
+      sample_size_original = scen$sample_size,
+      sample_size_DE = scen$sample_size_DE,
+      power_DE = NA_real_,
+      prop_cens_DE = NA_real_,
+      skipped_reason = "sample_size_DE_exceeds_cap"
+    )
+    saveRDS(res_skip, filename)
+    return(res_skip)
+  }
+  
   message(sprintf(">>> Power DE scenario %d | icc=%.2f, n_DE=%d", 
                   scenario_id, scen$icc, scen$sample_size_DE))
   
@@ -330,17 +347,10 @@ run_paper2_power_hospital <- function() {
 # MAIN
 # =============================================================================
 
-if (interactive()) {
-  cat("\n")
-  cat("Per eseguire Paper 2 Power:\n")
-  cat("  power_ind  <- run_paper2_power_individual()\n")
-  cat("  power_hosp <- run_paper2_power_hospital()\n")
-  cat("\n")
-} else {
-  power_individual <- run_paper2_power_individual()
-  power_hospital   <- run_paper2_power_hospital()
-  
-  power_combined <- bind_rows(power_individual, power_hospital)
-  saveRDS(power_combined, file.path(DIR_BASE, "paper2_POWER_ALL_RESULTS.rds"))
-  cat("\n\nTutti i risultati Paper 2 Power salvati.\n")
-}
+# Esecuzione (sia da RStudio che da terminale)
+power_individual <- run_paper2_power_individual()
+power_hospital   <- run_paper2_power_hospital()
+
+power_combined <- bind_rows(power_individual, power_hospital)
+saveRDS(power_combined, file.path(DIR_BASE, "paper2_POWER_ALL_RESULTS.rds"))
+cat("\n\nTutti i risultati Paper 2 Power salvati.\n")

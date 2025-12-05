@@ -195,29 +195,18 @@ run_paper1_hospital <- function() {
 # MAIN - Esegui entrambi i disegni
 # =============================================================================
 
-if (interactive()) {
-  cat("\n")
-  cat("Per eseguire Paper 1:\n")
-  cat("  results_ind  <- run_paper1_individual()\n")
-  cat("  results_hosp <- run_paper1_hospital()\n")
-  cat("\n")
-  cat("Oppure esegui tutto con:\n")
-  cat("  source('03_paper1_icc.R')\n")
-  cat("  # poi decommentare le righe sotto\n")
-} else {
-  # Esecuzione batch (quando si fa source() da terminale)
-  results_individual <- run_paper1_individual()
-  results_hospital   <- run_paper1_hospital()
-  
-  # Combina i due disegni
-  results_combined <- bind_rows(
-    results_individual %>% mutate(design = "individual"),
-    results_hospital %>% mutate(design = "hospital")
-  )
-  
-  saveRDS(results_combined, file.path(DIR_BASE, "paper1_ICC_ALL_RESULTS.rds"))
-  cat("\n\nTutti i risultati Paper 1 salvati in: results_optimized/paper1_ICC_ALL_RESULTS.rds\n")
-}
+# Esecuzione (sia da RStudio che da terminale)
+results_individual <- run_paper1_individual()
+results_hospital   <- run_paper1_hospital()
+
+# Combina i due disegni
+results_combined <- bind_rows(
+  results_individual %>% mutate(design = "individual"),
+  results_hospital %>% mutate(design = "hospital")
+)
+
+saveRDS(results_combined, file.path(DIR_BASE, "paper1_ICC_ALL_RESULTS.rds"))
+cat("\n\nTutti i risultati Paper 1 salvati in: results_optimized/paper1_ICC_ALL_RESULTS.rds\n")
 
 # Chiudi workers
 # plan(sequential)
