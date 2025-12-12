@@ -12,6 +12,8 @@
 #   3. I risultati sono salvati in results_optimized/paper1_icc_*
 # =============================================================================
 
+set.seed(123) ####modificato
+
 # --- Setup ---
 source("01_config.R")
 source("02_functions.R")
