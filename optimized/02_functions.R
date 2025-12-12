@@ -7,6 +7,7 @@ library(survival)
 library(tidyverse)
 library(lme4)
 library(coxme)
+library(frailtypack)
 
 # =============================================================================
 # HELPER FUNCTIONS PER CHUNKING E CHECKPOINT
@@ -459,20 +460,54 @@ icc_estimation <- function(data) {
   icc_proportion <- if (denominator != 0) numerator / denominator else NA
   
   # Method 10 – Weibull combined frailty (Oliveira 2016)
+
+  #### MODIFICATO!
+  ## 2 VERSIONI oLIVEIRA                                         
+  ## VERS 1   - stessa stima modello, diversa stima ICC                                        
   icc_weibull_combined_fit <- tryCatch({
     coxme(Surv(eventtime, status) ~ 1 + (1|hospital), data = data)
   }, error = function(e) NULL)
   
-  icc_weibull_combined <- if (!is.null(icc_weibull_combined_fit)) {
+  icc_weibull_combined_vers1 <- if (!is.null(icc_weibull_combined_fit)) {
     D <- VarCorr(icc_weibull_combined_fit)$hospital[[1]]
-    D / (D + 1)
+   # D / (D + 1)
+    ##approssimazione Exp - Normal
+   1 - ( 1 / (exp(D)*(2*exp(D)-1)))
   } else { NA }
   
+## VERSIONE 2 - uso altro modello per stimare, più fedele al paper
+mod_comb_frapen <- tryCatch({
+    frailtyPenal(
+      Surv(eventtime, status) ~ 1 + cluster(hospital),
+      data = data,
+      hazard = "Weibull",
+      RandDist = "LogN"
+    )
+  }, error = function(e) NULL)
+  
+icc_weibull_combined_vers2 <- tryCatch({
+    
+    if (is.null(mod_comb_frapen))
+      stop("The frailtyPenal model failed.")
+    
+    D2 <- mod_comb_frapen$sigma2
+    shape <- mod_comb_frapen$shape.weib[1]
+    
+    num <- gamma((2/shape) + 1) - (gamma((1/shape) + 1))^2
+    
+    denom <- exp(D2 / (shape^2)) *
+      ( gamma(2/shape + 1) * exp(D2 / (shape^2)) -
+          (gamma(1/shape + 1)^2) )
+    
+  1 - (num / denom)
+  }, error = function(e) NA)  
+                                   
   # Valore teorico (se presente)
   icc_theoretical <- if ("icc" %in% names(data)) {
     unique(data$icc)[1]
-  } else { NA }
-  
+  } else { NA }                                    
+
+                                       
   # Output
   data.frame(
     Method = c(
@@ -484,7 +519,8 @@ icc_estimation <- function(data) {
       "Censoring indicators",
       "Observed event times",
       "Martingale",
-      "Weibull combined model",
+      "Weibull combined model CoxMe",  ## modificato
+      "Weibull combined model frailtypack",  ## modificato
       "Proportion of event",
       "Start ICC - 0"
     ),
@@ -497,7 +533,8 @@ icc_estimation <- function(data) {
       icc_censoring,
       icc_event,
       icc_martingale,
-      icc_weibull_combined,
+      icc_weibull_combined_vers1, ## modificato
+      icc_weibull_combined_vers2, ## modificato
       icc_proportion,
       icc_theoretical
     ), 3)
