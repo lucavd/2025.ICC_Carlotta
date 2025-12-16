@@ -15,7 +15,9 @@ required_packages <- c(
 "survival",
 "lme4",
 "coxme",
-"lhs"
+"lhs",
+"frailtypack",
+"parfm"
 )
 
 # Installa i pacchetti mancanti
