@@ -8,6 +8,7 @@ library(tidyverse)
 library(lme4)
 library(coxme)
 library(frailtypack)
+library(parfm)
 
 # =============================================================================
 # HELPER FUNCTIONS PER CHUNKING E CHECKPOINT
@@ -289,12 +290,41 @@ simulate_survival_cohort_hospital <- function(num_hosp,
 
 icc_estimation <- function(data) {
   
-  # Method 1 – Weibull / Log-normal
+  # Method 1 – Weibull / Log-normal - from:  Williams (1995) Crowder & Hand (1990)
   data$logT <- log(data$eventtime)
   fit <- lmer(logT ~ 1 + (1 | hospital), data = data)
   var_cluster <- as.numeric(VarCorr(fit)$hospital[1])
   var_resid_theoretical <- pi^2 / 6
   icc_weibull <- var_cluster / (var_cluster + var_resid_theoretical)
+
+  # --- Method 1: Weibull PARFARM --- VERSIONE 2   ## aggiunto
+  icc_weibull2 <- tryCatch({
+    fit_parfm <- parfm(
+      Surv(eventtime, status) ~ 1,
+      cluster = "hospital",
+      data = data,
+      dist = "weibull",
+      frailty = "lognormal" )
+    a <- as_tibble(fit_parfm)
+    gamma <- as.numeric(a[2,1])
+    var_cluster2 <- as.numeric(a[1,1])
+    var_resid <- pi^2 / (6 * gamma^2)
+    var_cluster2 / (var_cluster2 + var_resid)
+  }, error = function(e) NA)
+   
+   # --- Method 1: Weibull frailtyPenal --- VERSIONE 3   ## aggiunto
+  icc_weibull3 <- tryCatch({
+    mod_comb_frapen_met1 <- frailtyPenal(
+      Surv(eventtime, status) ~ 1 + cluster(hospital),
+      data = data,
+      hazard = "Weibull",
+      RandDist = "LogN"    )
+    var_cluster3 <- mod_comb_frapen_met1$sigma2
+    shape <- mod_comb_frapen_met1$shape.weib[1]
+    var_resid3 <- pi^2 / (6 * shape^2)
+    var_cluster3 / (var_cluster3 + var_resid3)
+  }, error = function(e) NA)
+
   
   # Method 2 – CoxME Gaussian frailty
   mod_coxme <- tryCatch({
@@ -462,7 +492,7 @@ icc_estimation <- function(data) {
   # Method 10 – Weibull combined frailty (Oliveira 2016)
 
   #### MODIFICATO!
-  ## 2 VERSIONI oLIVEIRA                                         
+  ## 2 VERSIONI OLIVEIRA                                         
   ## VERS 1   - stessa stima modello, diversa stima ICC                                        
   icc_weibull_combined_fit <- tryCatch({
     coxme(Surv(eventtime, status) ~ 1 + (1|hospital), data = data)
@@ -511,7 +541,9 @@ icc_weibull_combined_vers2 <- tryCatch({
   # Output
   data.frame(
     Method = c(
-      "Analytical Log-Weibull",
+      "Weibull log-normal frailty",
+      "Weibull log-normal frailty - parfm",
+      "Weibull log-normal frailty - frailtypack",
       "CoxME Gaussian frailty",
       "Cox gamma frailty (NP)",
       "GLMM logit discretized",
@@ -526,6 +558,8 @@ icc_weibull_combined_vers2 <- tryCatch({
     ),
     ICC = round(c(
       icc_weibull,
+      icc_weibull2,
+      icc_weibull3,
       icc_coxme,
       icc_gamma_np,
       icc_glmm,
