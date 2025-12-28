@@ -33,7 +33,10 @@ setup_parallel <- function(n_workers = N_CORES) {
   # }
   
   plan(multisession, workers = n_workers)
-  handlers(global = TRUE)  # abilita progress bar
+  handlers(handler_progress(
+    format = "[:bar] :current/:total (:percent) | Elapsed: :elapsed | ETA: :eta",
+    clear = FALSE
+  ))
   message(sprintf("Piano parallelo attivato: %d workers", n_workers))
 }
 

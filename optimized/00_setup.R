@@ -17,7 +17,8 @@ required_packages <- c(
 "coxme",
 "lhs",
 "frailtypack",
-"parfm"
+"parfm",
+"R.utils"
 )
 
 # Installa i pacchetti mancanti

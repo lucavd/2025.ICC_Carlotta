@@ -121,23 +121,19 @@ run_paper1_individual <- function() {
   cat(sprintf("Totale simulazioni: %s\n\n", 
               format(nrow(scenarios) * PAPER1_N_REP, big.mark = ",")))
   
-  # Esegui in parallelo con progress bar
-  with_progress({
-    p <- progressor(steps = nrow(scenarios))
-    
-    results <- future_map(1:nrow(scenarios), function(i) {
-      res <- process_icc_scenario(
-        scenario_id = i,
-        scen = scenarios[i, ],
-        n_rep = PAPER1_N_REP,
-        chunk_size = PAPER1_CHUNK_SIZE,
-        dir_out = DIR_PAPER1_IND,
-        simula_fun = simulate_survival_cohort_individual
-      )
-      p()
-      res
-    }, .options = furrr_options(seed = TRUE))
-  })
+  # Loop sequenziale (mostra output)
+  results <- vector("list", nrow(scenarios))
+  for (i in seq_len(nrow(scenarios))) {
+    cat(sprintf("\n[%d/%d] ", i, nrow(scenarios)))
+    results[[i]] <- process_icc_scenario(
+      scenario_id = i,
+      scen = scenarios[i, ],
+      n_rep = PAPER1_N_REP,
+      chunk_size = PAPER1_CHUNK_SIZE,
+      dir_out = DIR_PAPER1_IND,
+      simula_fun = simulate_survival_cohort_individual
+    )
+  }
   
   # Combina tutti i risultati
   final_results <- bind_rows(results)
@@ -166,22 +162,19 @@ run_paper1_hospital <- function() {
   cat(sprintf("Totale simulazioni: %s\n\n", 
               format(nrow(scenarios) * PAPER1_N_REP, big.mark = ",")))
   
-  with_progress({
-    p <- progressor(steps = nrow(scenarios))
-    
-    results <- future_map(1:nrow(scenarios), function(i) {
-      res <- process_icc_scenario(
-        scenario_id = i,
-        scen = scenarios[i, ],
-        n_rep = PAPER1_N_REP,
-        chunk_size = PAPER1_CHUNK_SIZE,
-        dir_out = DIR_PAPER1_HOSP,
-        simula_fun = simulate_survival_cohort_hospital
-      )
-      p()
-      res
-    }, .options = furrr_options(seed = TRUE))
-  })
+  # Loop sequenziale (mostra output)
+  results <- vector("list", nrow(scenarios))
+  for (i in seq_len(nrow(scenarios))) {
+    cat(sprintf("\n[%d/%d] ", i, nrow(scenarios)))
+    results[[i]] <- process_icc_scenario(
+      scenario_id = i,
+      scen = scenarios[i, ],
+      n_rep = PAPER1_N_REP,
+      chunk_size = PAPER1_CHUNK_SIZE,
+      dir_out = DIR_PAPER1_HOSP,
+      simula_fun = simulate_survival_cohort_hospital
+    )
+  }
   
   final_results <- bind_rows(results)
   

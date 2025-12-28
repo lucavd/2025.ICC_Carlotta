@@ -5,6 +5,7 @@
 library(simsurv)
 library(survival)
 library(tidyverse)
+library(parallel)
 library(lme4)
 library(coxme)
 library(frailtypack)
@@ -304,7 +305,10 @@ icc_estimation <- function(data) {
       cluster = "hospital",
       data = data,
       dist = "weibull",
-      frailty = "lognormal" )
+      frailty = "lognormal",
+      maxit = 100,  # Ridotto da default 300 per convergenza più veloce
+      correct = 0   # Disabilita correzioni che rallentano
+    )
     a <- as_tibble(fit_parfm)
     gamma <- as.numeric(a[2,1])
     var_cluster2 <- as.numeric(a[1,1])
@@ -318,7 +322,11 @@ icc_estimation <- function(data) {
       Surv(eventtime, status) ~ 1 + cluster(hospital),
       data = data,
       hazard = "Weibull",
-      RandDist = "LogN"    )
+      RandDist = "LogN",
+      n.knots = 8,           # Ridotto per velocità
+      kappa = c(10000, 10000),  # Convergenza più permissiva
+      maxit.glim = 100       # Ridotto da default 200
+    )
     var_cluster3 <- mod_comb_frapen_met1$sigma2
     shape <- mod_comb_frapen_met1$shape.weib[1]
     var_resid3 <- pi^2 / (6 * shape^2)
@@ -369,49 +377,58 @@ icc_estimation <- function(data) {
   } else { icc_gamma_np <- NA }
   
   # Method 4 – GLMM cloglog on discretized time
-  q <- quantile(data$eventtime, probs = c(0.25, 0.5, 0.75), na.rm = TRUE)
+  # Usa percentili più sparsi per evitare duplicati
+  q <- quantile(data$eventtime, probs = seq(0.2, 0.8, by = 0.2), na.rm = TRUE)
   q <- unique(q)
   tmin <- min(data$eventtime, na.rm = TRUE)
-  q <- q[q > tmin]
+  tmax <- max(data$eventtime, na.rm = TRUE)
+  q <- q[q > tmin & q < tmax]
   
-  discretized_db <- survSplit(
-    Surv(eventtime, status) ~ hospital,
-    data = data,
-    cut = q,
-    start = "tstart",
-    end = "tstop"
-  )
-  
-  discretized_db$interval <- case_when(
-    discretized_db$tstart == 0 ~ 1,
-    discretized_db$tstart == q[1] ~ 2,
-    length(q) > 1 & discretized_db$tstart == q[2] ~ 3,
-    length(q) > 2 & discretized_db$tstart == q[3] ~ 4
-  )
-  
-  mod_glmm <- tryCatch({
-    glmer(
-      status ~ as.factor(interval) + (1|hospital),
-      data = discretized_db,
-      family = binomial(link = "cloglog"),
-      nAGQ = 5
-    )
-  }, error = function(e) NULL)
-  
-  icc_glmm <- if (!is.null(mod_glmm) && !isSingular(mod_glmm)) {
-    var_glmm <- mod_glmm@theta^2
-    var_glmm / (var_glmm + pi^2 / 6)
-  } else { NA }
+  # Se non ci sono abbastanza cut points, skip
+icc_glmm <- NA
+  if (length(q) >= 1) {
+    discretized_db <- tryCatch({
+      survSplit(
+        Surv(eventtime, status) ~ .,
+        data = data[, c("eventtime", "status", "hospital")],
+        cut = q,
+        start = "tstart",
+        end = "tstop"
+      )
+    }, error = function(e) NULL)
+    
+    if (!is.null(discretized_db)) {
+      # Assegna intervalli in base a tstart
+      discretized_db$interval <- findInterval(discretized_db$tstart, c(0, q)) + 1
+      
+      mod_glmm <- tryCatch({
+        glmer(
+          status ~ as.factor(interval) + (1|hospital),
+          data = discretized_db,
+          family = binomial(link = "cloglog"),
+          nAGQ = 5
+        )
+      }, error = function(e) NULL)
+      
+      if (!is.null(mod_glmm) && !isSingular(mod_glmm)) {
+        var_glmm <- mod_glmm@theta^2
+        icc_glmm <- var_glmm / (var_glmm + pi^2 / 6)
+      }
+    }
+  }
   
   # Method 5 – CoxME on discretized time
-  mod_cox_exploded <- tryCatch({
-    coxme(Surv(tstart, tstop, status) ~ 1 + (1|hospital), data = discretized_db)
-  }, error = function(e) NULL)
-  
-  icc_cox_exploded <- if (!is.null(mod_cox_exploded)) {
-    var_exploded <- VarCorr(mod_cox_exploded)$hospital[[1]]
-    var_exploded / (var_exploded + pi^2 / 6)
-  } else { NA }
+  icc_cox_exploded <- NA
+  if (exists("discretized_db") && !is.null(discretized_db)) {
+    mod_cox_exploded <- tryCatch({
+      coxme(Surv(tstart, tstop, status) ~ 1 + (1|hospital), data = discretized_db)
+    }, error = function(e) NULL)
+    
+    if (!is.null(mod_cox_exploded)) {
+      var_exploded <- VarCorr(mod_cox_exploded)$hospital[[1]]
+      icc_cox_exploded <- var_exploded / (var_exploded + pi^2 / 6)
+    }
+  }
   
   # Method 6 – Censoring indicators
   grand_mean <- mean(data$status, na.rm = TRUE)
