@@ -28,6 +28,7 @@ run_with_chunks <- function(scenario_id, n_rep, chunk_size, dir_out, rep_fun, ..
   
   n_chunks <- ceiling(n_rep / chunk_size)
   all_results <- vector("list", n_chunks)
+  max_consecutive_failures <- 10  # Se 10 repliche consecutive falliscono, salta al prossimo chunk
   
   for (ch in seq_len(n_chunks)) {
     chunk_file <- file.path(dir_out, sprintf("scenario_%s_chunk_%03d.rds", scenario_id, ch))
@@ -43,15 +44,33 @@ run_with_chunks <- function(scenario_id, n_rep, chunk_size, dir_out, rep_fun, ..
     end_rep <- min(ch * chunk_size, n_rep)
     n_this_chunk <- end_rep - start_rep + 1
     
-    # Esegui repliche
-    chunk_results <- map_dfr(seq_len(n_this_chunk), function(r) {
-      tryCatch(rep_fun(...), error = function(e) NULL)
-    })
+    # Esegui repliche con failsafe
+    chunk_results_list <- list()
+    consecutive_failures <- 0
     
-    # Salva checkpoint
-    if (nrow(chunk_results) > 0) {
-      saveRDS(chunk_results, chunk_file)
+    for (r in seq_len(n_this_chunk)) {
+      result <- tryCatch(rep_fun(...), error = function(e) {
+        message(sprintf("  Replica %d/%d errore: %s", r, n_this_chunk, conditionMessage(e)))
+        NULL
+      })
+      
+      if (is.null(result)) {
+        consecutive_failures <- consecutive_failures + 1
+        if (consecutive_failures >= max_consecutive_failures) {
+          message(sprintf("  !!! %d fallimenti consecutivi, salto resto del chunk", max_consecutive_failures))
+          break
+        }
+      } else {
+        consecutive_failures <- 0
+        chunk_results_list[[length(chunk_results_list) + 1]] <- result
+      }
     }
+    
+    chunk_results <- bind_rows(chunk_results_list)
+    
+    # SEMPRE salva il chunk (anche se vuoto/parziale) per evitare loop infiniti
+    saveRDS(chunk_results, chunk_file)
+    message(sprintf("  Chunk %d/%d salvato: %d repliche valide", ch, n_chunks, nrow(chunk_results)))
     
     all_results[[ch]] <- chunk_results
   }
