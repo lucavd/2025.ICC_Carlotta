@@ -4,14 +4,19 @@
 
 ```
 optimized/
-├── 00_setup.R              # Installa pacchetti (esegui UNA volta)
-├── 01_config.R             # Configurazione parametri e grid
-├── 02_functions.R          # Funzioni simulazione + helper chunking
-├── 03_paper1_icc.R         # Paper 1: confronto stimatori ICC
-├── 04_paper2_power.R       # Paper 2: impatto ICC su potenza
-├── 05_paper2_sample_size.R # Paper 2: sample size per power 80%
-├── run_all.R               # Script master
-└── README.md               # Questo file
+├── 00_setup.R                  # Installa pacchetti (esegui UNA volta)
+├── 01_config.R                 # Configurazione parametri e grid
+├── 02_functions.R              # Funzioni simulazione + helper chunking
+├── 03_paper1_icc.R             # Paper 1: confronto stimatori ICC
+├── 04_paper2_power.R           # Paper 2: impatto ICC su potenza
+├── 05_paper2_sample_size.R     # Paper 2: sample size per power 80%
+├── run_all.R                   # Script master
+├── run_hospital_callr.R        # Hospital con timeout (20 worker paralleli)
+├── run_individual_callr.R      # Individual con timeout (20 worker paralleli)
+├── launch_hospital_callr.bat   # Avvia hospital
+├── launch_individual_callr.bat # Avvia individual
+├── launch_monitor.bat          # Monitor progresso
+└── README.md                   # Questo file
 ```
 
 ## Quick Start
@@ -21,13 +26,23 @@ optimized/
 cd optimized
 Rscript 00_setup.R
 
-# 2. Esegui tutto
-Rscript run_all.R
+# 2. Esegui simulazioni con timeout (RACCOMANDATO)
+# Doppio click su launch_hospital_callr.bat o launch_individual_callr.bat
 
-# Oppure solo parti specifiche:
-Rscript run_all.R paper1
-Rscript run_all.R paper2
+# Oppure da terminale:
+Rscript run_hospital_callr.R
+Rscript run_individual_callr.R
 ```
+
+## Esecuzione con Timeout (Callr)
+
+Gli script `run_*_callr.R` usano il pacchetto `callr` per eseguire ogni replica in un processo separato con timeout di 30 secondi. Questo risolve il problema delle repliche che si bloccano su modelli statistici complessi.
+
+**Caratteristiche:**
+- 20 worker paralleli
+- Timeout 30s per replica (kill se non finisce)
+- Retry automatico per repliche fallite
+- Skip scenari già completati
 
 ## Configurazione Server HPC
 
@@ -97,8 +112,9 @@ results_optimized/
 │   └── power_results_hospital_FINAL.rds
 ├── paper2_sample_size/
 │   └── sample_size_individual_FINAL.rds
-├── paper1_ICC_ALL_RESULTS.rds       # combinato
-├── paper2_POWER_ALL_RESULTS.rds     # combinato
+├── paper1_ICC_HOSPITAL_ALL_RESULTS.rds   # Hospital completato
+├── paper1_ICC_INDIVIDUAL_ALL_RESULTS.rds # Individual (da generare)
+├── paper2_POWER_ALL_RESULTS.rds          # combinato
 └── paper2_SAMPLE_SIZE_ALL_RESULTS.rds
 ```
 
@@ -108,7 +124,8 @@ results_optimized/
 library(tidyverse)
 
 # Paper 1
-icc_results <- readRDS("results_optimized/paper1_ICC_ALL_RESULTS.rds")
+icc_hospital <- readRDS("results_optimized/paper1_ICC_HOSPITAL_ALL_RESULTS.rds")
+icc_individual <- readRDS("results_optimized/paper1_ICC_INDIVIDUAL_ALL_RESULTS.rds")
 
 # Paper 2
 power_results <- readRDS("results_optimized/paper2_POWER_ALL_RESULTS.rds")

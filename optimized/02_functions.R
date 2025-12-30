@@ -24,58 +24,77 @@ library(parfm)
 #' @param rep_fun Funzione da eseguire per ogni replica (deve restituire un data.frame/tibble)
 #' @param ... Argomenti passati a rep_fun
 #' @return tibble con risultati aggregati
-run_with_chunks <- function(scenario_id, n_rep, chunk_size, dir_out, rep_fun, ...) {
+run_with_chunks_parallel <- function(scenario_id, n_rep, chunk_size, dir_out, rep_fun, 
+                                      n_workers = N_CORES, timeout_sec = 120, ...) {
   
-  n_chunks <- ceiling(n_rep / chunk_size)
-  all_results <- vector("list", n_chunks)
-  max_consecutive_failures <- 10  # Se 10 repliche consecutive falliscono, salta al prossimo chunk
-  
-  for (ch in seq_len(n_chunks)) {
-    chunk_file <- file.path(dir_out, sprintf("scenario_%s_chunk_%03d.rds", scenario_id, ch))
-    
-    # Se il chunk esiste già, caricalo
-    if (file.exists(chunk_file)) {
-      all_results[[ch]] <- readRDS(chunk_file)
-      next
-    }
-    
-    # Calcola range di repliche per questo chunk
-    start_rep <- (ch - 1) * chunk_size + 1
-    end_rep <- min(ch * chunk_size, n_rep)
-    n_this_chunk <- end_rep - start_rep + 1
-    
-    # Esegui repliche con failsafe
-    chunk_results_list <- list()
-    consecutive_failures <- 0
-    
-    for (r in seq_len(n_this_chunk)) {
-      result <- tryCatch(rep_fun(...), error = function(e) {
-        message(sprintf("  Replica %d/%d errore: %s", r, n_this_chunk, conditionMessage(e)))
-        NULL
-      })
-      
-      if (is.null(result)) {
-        consecutive_failures <- consecutive_failures + 1
-        if (consecutive_failures >= max_consecutive_failures) {
-          message(sprintf("  !!! %d fallimenti consecutivi, salto resto del chunk", max_consecutive_failures))
-          break
-        }
-      } else {
-        consecutive_failures <- 0
-        chunk_results_list[[length(chunk_results_list) + 1]] <- result
-      }
-    }
-    
-    chunk_results <- bind_rows(chunk_results_list)
-    
-    # SEMPRE salva il chunk (anche se vuoto/parziale) per evitare loop infiniti
-    saveRDS(chunk_results, chunk_file)
-    message(sprintf("  Chunk %d/%d salvato: %d repliche valide", ch, n_chunks, nrow(chunk_results)))
-    
-    all_results[[ch]] <- chunk_results
+  summary_file <- file.path(dir_out, sprintf("scenario_%s_summary.rds", scenario_id))
+  if (file.exists(summary_file)) {
+    message(sprintf("Scenario %s già completato", scenario_id))
+    return(readRDS(summary_file))
   }
   
-  bind_rows(all_results)
+  message(sprintf("Scenario %s: parallelizzazione %d repliche con %d worker (timeout %ds)", 
+                  scenario_id, n_rep, n_workers, timeout_sec))
+  
+  # Setup parallelizzazione
+  plan(multisession, workers = n_workers)
+  
+  # Esegui repliche in parallelo con retry per quelle fallite
+  all_results <- list()
+  attempts <- 0
+  max_attempts <- n_rep * 3  # Max 3x tentativi (se molte falliscono)
+  
+  while (length(all_results) < n_rep && attempts < max_attempts) {
+    needed <- n_rep - length(all_results)
+    message(sprintf("  Tentativo: %d repliche valide, ne servono %d", length(all_results), needed))
+    
+    # Crea futures con timeout
+    futures_list <- lapply(seq_len(needed), function(i) {
+      future({
+        tryCatch({
+          rep_fun(...)
+        }, error = function(e) {
+          NULL
+        })
+      }, seed = TRUE)
+    })
+    
+    # Raccogli risultati con timeout
+    batch_results <- lapply(futures_list, function(fut) {
+      tryCatch({
+        value(fut, timeout = timeout_sec)
+      }, FutureError = function(e) {
+        if (grepl("timeout", conditionMessage(e), ignore.case = TRUE)) {
+          message("Replica timeout")
+        }
+        NULL
+      }, error = function(e) {
+        NULL
+      })
+    })
+    
+    # Filtra risultati validi
+    valid_results <- batch_results[!sapply(batch_results, is.null)]
+    all_results <- c(all_results, valid_results)
+    
+    attempts <- attempts + needed
+    message(sprintf("  Batch completato: %d/%d valide (totale: %d/%d)", 
+                    length(valid_results), needed, length(all_results), n_rep))
+  }
+  
+  # Tronca a n_rep se ne abbiamo di più
+  if (length(all_results) > n_rep) {
+    all_results <- all_results[1:n_rep]
+  }
+  
+  results_df <- bind_rows(all_results)
+  
+  # Salva risultato finale
+  saveRDS(results_df, summary_file)
+  message(sprintf("Scenario %s completato: %d/%d repliche valide", 
+                  scenario_id, nrow(results_df), n_rep))
+  
+  return(results_df)
 }
 
 #' Carica tutti i risultati da una directory di chunk
