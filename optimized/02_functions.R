@@ -643,6 +643,10 @@ surv_power_function <- function(simula_coorte_fun, simula_args = list(), nsim = 
   
   for (i in 1:nsim) {
     cohort <- do.call(simula_coorte_fun, simula_args)
+
+    # Calcolo CV dei cluster (dimensioni ospedali) ###DA AGGIUNGERE
+    cluster_sizes <- table(cohort$hospital) ## QUESTO
+    cv_empirico <- sd(cluster_sizes) / mean(cluster_sizes)  ## QUESTO
     
     if (i == 1) {
       sigma_hosp <- unique(cohort$sigma_hosp)
@@ -670,6 +674,7 @@ surv_power_function <- function(simula_coorte_fun, simula_args = list(), nsim = 
     num_pat_group_mean = num_pat_group_mean,
     sample_size = sample_size,
     power = power,
+    cv = cv_empirico, ###AGGIUNGERE SOLO QUESTO
     prop_cens = prop_cens_mean
   )
 }
