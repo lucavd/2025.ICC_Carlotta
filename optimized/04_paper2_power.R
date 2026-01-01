@@ -71,15 +71,17 @@ process_power_scenario <- function(scenario_id, scen, nsim, dir_out, simula_fun)
       cens = scen$cens,
       balancing_mode = scen$balancing_mode,
       # Design Effect
-      DE = 1 + (sample_size / num_hosp - 1) * icc,
-      sample_size_DE = ceiling(sample_size * DE)
+      # DE = 1 + (sample_size / num_hosp - 1) * icc, ###MODIFICATO
+      DE_CV = 1+ ((cv_empirico^2 + 1) * (sample_size / num_hosp) - 1)* icc,  ##AGGIUNTO
+      # sample_size_DE = ceiling(sample_size * DE) ###MODIFICATO
+      sample_size_DE_CV = ceiling(sample_size * DE_CV) ##AGGIUNTO
     )
   
   saveRDS(res, filename)
   return(res)
 }
 
-
+                
 # =============================================================================
 # FUNZIONE PER SCENARIO DE (verifica power con sample size corretto)
 # =============================================================================
@@ -105,7 +107,8 @@ process_power_DE_scenario <- function(scenario_id, scen, nsim, dir_out, simula_f
     res_skip <- tibble(
       scenario_id = scenario_id,
       sample_size_original = scen$sample_size,
-      sample_size_DE = scen$sample_size_DE,
+      #sample_size_DE = scen$sample_size_DE, ###MODIFICATO
+      sample_size_DE_CV = scen$sample_size_DE_CV, ###MODIFICATO
       power_DE = NA_real_,
       prop_cens_DE = NA_real_,
       skipped_reason = "sample_size_DE_exceeds_cap"
@@ -122,7 +125,8 @@ process_power_DE_scenario <- function(scenario_id, scen, nsim, dir_out, simula_f
       simula_coorte_fun = simula_fun,
       simula_args = list(
         num_hosp = scen$num_hosp,
-        sample_size = scen$sample_size_DE,  # <- sample size corretto per DE
+        #sample_size = scen$sample_size_DE,  # <- sample size corretto per DE
+        sample_size_DE_CV = scen$sample_size_DE_CV,  # <- sample size corretto per DE ###MODIFICATO
         balancing_mode = scen$balancing_mode,
         pop_treat_effect = scen$pop_treat_effect,
         lambda = scen$lambda,
