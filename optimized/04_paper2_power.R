@@ -15,6 +15,9 @@ source("01_config.R")
 source("02_functions.R")
 
 create_dirs()
+
+
+create_dirs()
 setup_parallel(N_CORES)
 
 # =============================================================================
@@ -71,9 +74,9 @@ process_power_scenario <- function(scenario_id, scen, nsim, dir_out, simula_fun)
       cens = scen$cens,
       balancing_mode = scen$balancing_mode,
       # Design Effect
-      # DE = 1 + (sample_size / num_hosp - 1) * icc, ###MODIFICATO
-      DE_CV = 1+ ((cv_empirico^2 + 1) * (sample_size / num_hosp) - 1)* icc,  ##AGGIUNTO
-      # sample_size_DE = ceiling(sample_size * DE) ###MODIFICATO
+      DE = 1 + (sample_size / num_hosp - 1) * icc, ###MODIFICATO
+      DE_CV = 1+ ((cv^2 + 1) * (sample_size / num_hosp) - 1)* icc,  ##AGGIUNTO
+      sample_size_DE = ceiling(sample_size * DE), ###MODIFICATO
       sample_size_DE_CV = ceiling(sample_size * DE_CV) ##AGGIUNTO
     )
   
@@ -107,7 +110,7 @@ process_power_DE_scenario <- function(scenario_id, scen, nsim, dir_out, simula_f
     res_skip <- tibble(
       scenario_id = scenario_id,
       sample_size_original = scen$sample_size,
-      #sample_size_DE = scen$sample_size_DE, ###MODIFICATO
+      sample_size_DE = scen$sample_size_DE, ###MODIFICATO
       sample_size_DE_CV = scen$sample_size_DE_CV, ###MODIFICATO
       power_DE = NA_real_,
       prop_cens_DE = NA_real_,
@@ -120,13 +123,17 @@ process_power_DE_scenario <- function(scenario_id, scen, nsim, dir_out, simula_f
   message(sprintf(">>> Power DE scenario %d | icc=%.2f, n_DE=%d", 
                   scenario_id, scen$icc, scen$sample_size_DE))
   
+  sample_size_used <- if (scen$balancing_mode == 1) {
+    scen$sample_size_DE
+  } else {
+    scen$sample_size_DE_CV  }
+  
   res <- tryCatch({
     surv_power_function(
       simula_coorte_fun = simula_fun,
       simula_args = list(
         num_hosp = scen$num_hosp,
-        #sample_size = scen$sample_size_DE,  # <- sample size corretto per DE
-        sample_size_DE_CV = scen$sample_size_DE_CV,  # <- sample size corretto per DE ###MODIFICATO
+        sample_size = sample_size_used, ### MODIFICA
         balancing_mode = scen$balancing_mode,
         pop_treat_effect = scen$pop_treat_effect,
         lambda = scen$lambda,
@@ -218,7 +225,7 @@ run_paper2_power_individual <- function() {
   if (nrow(results_DE_df) > 0) {
     results_final <- results_df %>%
       left_join(
-        results_DE_df %>% select(scenario_id, power_DE, prop_cens_DE),
+        results_DE_df %>% dplyr::select(scenario_id, power_DE, prop_cens_DE),
         by = "scenario_id"
       )
   } else {
@@ -233,14 +240,17 @@ run_paper2_power_individual <- function() {
       z_alpha = qnorm(1 - alpha / 2),
       p = 0.5,
       HR = exp(pop_treat_effect),
-      z_beta = qnorm(pmax(power, 0.01, na.rm = TRUE)),  # evita -Inf
+      z_beta = qnorm(pmax(power, 0.01, na.rm = TRUE)),
       E_schoenfeld = ((z_alpha + z_beta)^2) / (p * (1 - p) * (log(HR))^2),
+      E_freedman = ((z_alpha + z_beta)^2)*(HR+1)^2 / (HR - 1)^2,  ## Freedman: number of required events
       prop_eventi = 1 - prop_cens,
-      N_schoenfeld = ceiling(E_schoenfeld / pmax(prop_eventi, 0.01)),
-      N_xie = ceiling(N_schoenfeld * DE),
+      N_schoe = ceiling(E_schoenfeld / prop_eventi),
+      N_free = ceiling(E_freedman / prop_eventi),
+      DE = 1 + (num_pat_group_mean - 1) * icc,  ## DE for cluster correction per Xie (2003) ##per balance
+      N_xie_freedman = ceiling(N_free * DE) ,
       design = "individual"
     ) %>%
-    select(-alpha, -z_alpha, -p, -HR, -z_beta, -E_schoenfeld, -prop_eventi)
+    dplyr::select(-alpha, -z_alpha, -p, -HR, -z_beta, -E_schoenfeld, -prop_eventi)
   
   # Salva
   final_file <- file.path(DIR_PAPER2_POWER_IND, "power_results_individual_FINAL.rds")
@@ -316,7 +326,7 @@ run_paper2_power_hospital <- function() {
   if (nrow(results_DE_df) > 0) {
     results_final <- results_df %>%
       left_join(
-        results_DE_df %>% select(scenario_id, power_DE, prop_cens_DE),
+        results_DE_df %>% dplyr::select(scenario_id, power_DE, prop_cens_DE),
         by = "scenario_id"
       )
   } else {
@@ -332,12 +342,15 @@ run_paper2_power_hospital <- function() {
       HR = exp(pop_treat_effect),
       z_beta = qnorm(pmax(power, 0.01, na.rm = TRUE)),
       E_schoenfeld = ((z_alpha + z_beta)^2) / (p * (1 - p) * (log(HR))^2),
+      E_freedman = ((z_alpha + z_beta)^2)*(HR+1)^2 / (HR - 1)^2,  ## Freedman: number of required events
       prop_eventi = 1 - prop_cens,
-      N_schoenfeld = ceiling(E_schoenfeld / pmax(prop_eventi, 0.01)),
-      N_xie = ceiling(N_schoenfeld * DE),
+      N_schoe = ceiling(E_schoenfeld / prop_eventi),
+      N_free = ceiling(E_freedman / prop_eventi),
+      DE = 1 + (num_pat_group_mean - 1) * icc,  ## DE for cluster correction per Xie (2003) ##per balance
+      N_xie_freedman = ceiling(N_free * DE) ,
       design = "hospital"
     ) %>%
-    select(-alpha, -z_alpha, -p, -HR, -z_beta, -E_schoenfeld, -prop_eventi)
+    dplyr::select(-alpha, -z_alpha, -p, -HR, -z_beta, -E_schoenfeld, -prop_eventi, - E_freedman)
   
   final_file <- file.path(DIR_PAPER2_POWER_HOSP, "power_results_hospital_FINAL.rds")
   saveRDS(results_final, final_file)
@@ -345,6 +358,9 @@ run_paper2_power_hospital <- function() {
   
   return(results_final)
 }
+
+
+
 
 
 # =============================================================================
