@@ -200,7 +200,13 @@ simulate_survival_cohort_individual <- function(num_hosp,
     
     diff <- sample_size - sum(num_pat_group)
     if (diff != 0) {
-      adjust_index <- sample(1:num_hosp, 1)
+      if (diff > 0) {
+        adjust_index <- sample(1:num_hosp, 1)
+      } else {
+        valid_indices <- which(num_pat_group > abs(diff))
+        if (length(valid_indices) == 0) valid_indices <- which.max(num_pat_group)
+        adjust_index <- sample(valid_indices, 1)
+      }
       num_pat_group[adjust_index] <- num_pat_group[adjust_index] + diff
     }
   }
@@ -276,7 +282,13 @@ simulate_survival_cohort_hospital <- function(num_hosp,
     
     diff <- sample_size - sum(num_pat_group)
     if (diff != 0) {
-      adjust_index <- sample(1:num_hosp, 1)
+      if (diff > 0) {
+        adjust_index <- sample(1:num_hosp, 1)
+      } else {
+        valid_indices <- which(num_pat_group > abs(diff))
+        if (length(valid_indices) == 0) valid_indices <- which.max(num_pat_group)
+        adjust_index <- sample(valid_indices, 1)
+      }
       num_pat_group[adjust_index] <- num_pat_group[adjust_index] + diff
     }
   }
