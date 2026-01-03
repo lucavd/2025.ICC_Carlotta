@@ -36,12 +36,13 @@ cat(sprintf("Scenari paralleli: %d\n\n", N_PARALLEL))
 # FUNZIONE PER ESEGUIRE UN SINGOLO SCENARIO IN PROCESSO SEPARATO
 # =============================================================================
 
-run_single_scenario <- function(scenario_id, scen, nsim, dir_out, simula_fun_name, timeout_sec) {
+# Lancia processo in background (NON aspetta)
+launch_scenario <- function(scenario_id, scen, nsim, dir_out, simula_fun_name) {
   
   filename <- file.path(dir_out, sprintf("scenario_%03d.rds", scenario_id))
-  if (file.exists(filename)) return(list(success = TRUE, cached = TRUE))
+  if (file.exists(filename)) return(NULL)  # già completato
   
-  proc <- r_bg(
+  r_bg(
     function(scenario_id, scen, nsim, dir_out, simula_fun_name) {
       suppressPackageStartupMessages({
         source("01_config.R")
@@ -79,7 +80,6 @@ run_single_scenario <- function(scenario_id, scen, nsim, dir_out, simula_fun_nam
         )
       }
       
-      # Aggiungi info scenario e calcoli DE
       res <- res %>%
         mutate(
           scenario_id = scenario_id,
@@ -107,36 +107,54 @@ run_single_scenario <- function(scenario_id, scen, nsim, dir_out, simula_fun_nam
     ),
     package = TRUE
   )
-  
-  # Aspetta con timeout
+}
+
+# Aspetta lista di processi con timeout globale
+wait_processes <- function(procs, timeout_sec) {
   start <- Sys.time()
-  while (proc$is_alive()) {
+  
+  repeat {
+    # Conta quanti ancora vivi
+    alive <- sum(sapply(procs, function(p) !is.null(p) && p$is_alive()))
+    
+    if (alive == 0) break
+    
     elapsed <- as.numeric(difftime(Sys.time(), start, units = "secs"))
     if (elapsed > timeout_sec) {
-      proc$kill()
-      return(list(success = FALSE, reason = "TIMEOUT", time = elapsed))
+      # Kill tutti quelli ancora vivi
+      for (p in procs) {
+        if (!is.null(p) && p$is_alive()) p$kill()
+      }
+      break
     }
+    
     Sys.sleep(0.5)
   }
   
-  elapsed <- as.numeric(difftime(Sys.time(), start, units = "secs"))
+  # Conta successi/fallimenti
+  ok <- 0
+  fail <- 0
+  for (p in procs) {
+    if (is.null(p)) {
+      ok <- ok + 1  # era cached
+    } else {
+      res <- tryCatch(p$get_result(), error = function(e) NULL)
+      if (!is.null(res)) ok <- ok + 1 else fail <- fail + 1
+    }
+  }
   
-  tryCatch({
-    result <- proc$get_result()
-    list(success = TRUE, result = result, time = elapsed)
-  }, error = function(e) {
-    list(success = FALSE, reason = conditionMessage(e), time = elapsed)
-  })
+  list(ok = ok, fail = fail)
 }
 
 # =============================================================================
 # FUNZIONE PER ESEGUIRE SCENARIO DE
 # =============================================================================
 
-run_single_scenario_DE <- function(scenario_id, scen, nsim, dir_out, simula_fun_name, timeout_sec) {
+# Lancia processo DE in background (NON aspetta)
+launch_scenario_DE <- function(scenario_id, scen, nsim, dir_out, simula_fun_name) {
   
   filename <- file.path(dir_out, sprintf("scenario_DE_%03d.rds", scenario_id))
-  if (file.exists(filename)) return(list(success = TRUE, cached = TRUE))
+  if (file.exists(filename)) return(NULL)  # già completato
   
   # Skip se ICC = 0
   if (scen$icc == 0) return(NULL)
@@ -153,7 +171,7 @@ run_single_scenario_DE <- function(scenario_id, scen, nsim, dir_out, simula_fun_
     return(NULL)
   }
   
-  proc <- r_bg(
+  r_bg(
     function(scenario_id, scen, nsim, dir_out, simula_fun_name, sample_size_used) {
       suppressPackageStartupMessages({
         source("01_config.R")
@@ -202,25 +220,6 @@ run_single_scenario_DE <- function(scenario_id, scen, nsim, dir_out, simula_fun_
     ),
     package = TRUE
   )
-  
-  start <- Sys.time()
-  while (proc$is_alive()) {
-    elapsed <- as.numeric(difftime(Sys.time(), start, units = "secs"))
-    if (elapsed > timeout_sec * 2) {  # DE può essere più lento
-      proc$kill()
-      return(list(success = FALSE, reason = "TIMEOUT", time = elapsed))
-    }
-    Sys.sleep(0.5)
-  }
-  
-  elapsed <- as.numeric(difftime(Sys.time(), start, units = "secs"))
-  
-  tryCatch({
-    result <- proc$get_result()
-    list(success = TRUE, result = result, time = elapsed)
-  }, error = function(e) {
-    list(success = FALSE, reason = conditionMessage(e), time = elapsed)
-  })
 }
 
 # =============================================================================
@@ -256,21 +255,21 @@ process_scenarios_batch <- function(scenarios, dir_out, simula_fun_name, phase_n
     
     cat(sprintf("\nBatch di %d scenari (rimanenti: %d)... ", length(batch_ids), length(to_process)))
     
-    # Lancia processi in parallelo
+    # Lancia TUTTI i processi in parallelo (senza aspettare)
     procs <- lapply(batch_ids, function(id) {
-      run_single_scenario(
+      launch_scenario(
         scenario_id = id,
         scen = scenarios[id, ],
         nsim = NSIM,
         dir_out = dir_out,
-        simula_fun_name = simula_fun_name,
-        timeout_sec = TIMEOUT_SEC
+        simula_fun_name = simula_fun_name
       )
     })
     
-    # Conta risultati
-    batch_ok <- sum(sapply(procs, function(p) !is.null(p) && isTRUE(p$success)))
-    batch_timeout <- sum(sapply(procs, function(p) !is.null(p) && !isTRUE(p$success)))
+    # Aspetta TUTTI con timeout globale
+    results <- wait_processes(procs, TIMEOUT_SEC)
+    batch_ok <- results$ok
+    batch_timeout <- results$fail
     
     processed <- processed + batch_ok
     timeout_count <- timeout_count + batch_timeout
@@ -326,22 +325,24 @@ process_scenarios_DE_batch <- function(base_results, dir_out, simula_fun_name, p
     
     cat(sprintf("\nBatch DE di %d scenari... ", length(batch_ids)))
     
+    # Lancia TUTTI i processi DE in parallelo
     procs <- lapply(batch_ids, function(id) {
       scen_row <- scenarios_DE %>% filter(scenario_id == id)
       if (nrow(scen_row) == 0) return(NULL)
       
-      run_single_scenario_DE(
+      launch_scenario_DE(
         scenario_id = id,
         scen = scen_row,
         nsim = NSIM,
         dir_out = dir_out,
-        simula_fun_name = simula_fun_name,
-        timeout_sec = TIMEOUT_SEC
+        simula_fun_name = simula_fun_name
       )
     })
     
-    batch_ok <- sum(sapply(procs, function(p) !is.null(p) && isTRUE(p$success)))
-    batch_timeout <- sum(sapply(procs, function(p) !is.null(p) && !isTRUE(p$success)))
+    # Aspetta TUTTI con timeout globale (DE può essere più lento)
+    results <- wait_processes(procs, TIMEOUT_SEC * 2)
+    batch_ok <- results$ok
+    batch_timeout <- results$fail
     timeout_count <- timeout_count + batch_timeout
     
     cat(sprintf("%d OK, %d timeout/skip\n", batch_ok, batch_timeout))
@@ -372,7 +373,7 @@ if (length(base_files) > 0) {
   if (length(de_files) > 0) {
     results_DE_ind <- bind_rows(lapply(de_files, readRDS))
     results_final_ind <- results_base_ind %>%
-      left_join(results_DE_ind %>% select(scenario_id, power_DE, prop_cens_DE), by = "scenario_id")
+      left_join(results_DE_ind %>% dplyr::select(scenario_id, power_DE, prop_cens_DE), by = "scenario_id")
   } else {
     results_final_ind <- results_base_ind %>% mutate(power_DE = NA_real_, prop_cens_DE = NA_real_)
   }
@@ -403,7 +404,7 @@ if (length(base_files) > 0) {
   if (length(de_files) > 0) {
     results_DE_hosp <- bind_rows(lapply(de_files, readRDS))
     results_final_hosp <- results_base_hosp %>%
-      left_join(results_DE_hosp %>% select(scenario_id, power_DE, prop_cens_DE), by = "scenario_id")
+      left_join(results_DE_hosp %>% dplyr::select(scenario_id, power_DE, prop_cens_DE), by = "scenario_id")
   } else {
     results_final_hosp <- results_base_hosp %>% mutate(power_DE = NA_real_, prop_cens_DE = NA_real_)
   }
