@@ -222,7 +222,10 @@ run_pool_DE <- function(scenario_ids, scenarios_DE, dir_out, simula_fun_name, ma
       elapsed <- as.numeric(difftime(Sys.time(), w$start, units = "secs"))
       
       if (!w$proc$is_alive()) {
-        res <- tryCatch(w$proc$get_result(), error = function(e) NULL)
+        res <- tryCatch(w$proc$get_result(), error = function(e) {
+          cat(sprintf(" [E%d: %s]", w$id, conditionMessage(e)))
+          NULL
+        })
         if (!is.null(res)) completed <- completed + 1 else failed <- failed + 1
       } else if (elapsed > timeout_sec) {
         w$proc$kill()
