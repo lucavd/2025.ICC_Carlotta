@@ -15,7 +15,7 @@ source("02_functions.R")
 # Parametri
 TIMEOUT_SEC <- 900  # 15 minuti per processo
 NSIM <- PAPER2_POWER_NSIM  # 1000
-MAX_WORKERS <- 10
+MAX_WORKERS <- 5
 
 # Directory output
 dir_out_ind <- DIR_PAPER2_POWER_IND
