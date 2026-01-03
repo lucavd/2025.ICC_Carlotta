@@ -1,11 +1,11 @@
 # =============================================================================
 # run_paper2_power_callr.R - Paper 2 Power con timeout REALE via callr
-# 10 scenari paralleli, timeout 180s per scenario
+# Pool dinamico: max 10 worker, timeout 5 min per processo
 # =============================================================================
 
 cat("\n=== PAPER 2 POWER CON TIMEOUT CALLR ===\n")
-cat("Timeout per scenario: 180 secondi\n")
-cat("10 scenari in parallelo\n\n")
+cat("Pool dinamico: max 10 worker\n")
+cat("Timeout per processo: 5 minuti\n\n")
 
 library(callr)
 library(dplyr)
@@ -13,9 +13,9 @@ source("01_config.R")
 source("02_functions.R")
 
 # Parametri
-TIMEOUT_SEC <- 180
+TIMEOUT_SEC <- 300  # 5 minuti per processo
 NSIM <- PAPER2_POWER_NSIM  # 1000
-N_PARALLEL <- 10
+MAX_WORKERS <- 10
 
 # Directory output
 dir_out_ind <- DIR_PAPER2_POWER_IND
@@ -29,8 +29,8 @@ n_scenarios <- nrow(scenarios)
 
 cat(sprintf("Totale scenari: %d\n", n_scenarios))
 cat(sprintf("nsim per scenario: %d\n", NSIM))
-cat(sprintf("Timeout per scenario: %d secondi\n", TIMEOUT_SEC))
-cat(sprintf("Scenari paralleli: %d\n\n", N_PARALLEL))
+cat(sprintf("Timeout per processo: %d secondi\n", TIMEOUT_SEC))
+cat(sprintf("Max worker paralleli: %d\n\n", MAX_WORKERS))
 
 # =============================================================================
 # FUNZIONE PER ESEGUIRE UN SINGOLO SCENARIO IN PROCESSO SEPARATO
@@ -109,41 +109,143 @@ launch_scenario <- function(scenario_id, scen, nsim, dir_out, simula_fun_name) {
   )
 }
 
-# Aspetta lista di processi con timeout globale
-wait_processes <- function(procs, timeout_sec) {
-  start <- Sys.time()
+# Pool dinamico: gestisce max_workers processi, lancia nuovo appena uno finisce
+run_pool <- function(scenario_ids, scenarios, dir_out, simula_fun_name, max_workers, timeout_sec) {
   
-  repeat {
-    # Conta quanti ancora vivi
-    alive <- sum(sapply(procs, function(p) !is.null(p) && p$is_alive()))
+  # Stato del pool
+  queue <- scenario_ids  # Coda scenari da processare
+  active <- list()       # Lista processi attivi: list(proc=, id=, start=)
+  completed <- 0
+  failed <- 0
+  
+  start_total <- Sys.time()
+  
+  while (length(queue) > 0 || length(active) > 0) {
     
-    if (alive == 0) break
-    
-    elapsed <- as.numeric(difftime(Sys.time(), start, units = "secs"))
-    if (elapsed > timeout_sec) {
-      # Kill tutti quelli ancora vivi
-      for (p in procs) {
-        if (!is.null(p) && p$is_alive()) p$kill()
+    # 1. Lancia nuovi processi se c'è spazio
+    while (length(active) < max_workers && length(queue) > 0) {
+      id <- queue[1]
+      queue <- queue[-1]
+      
+      proc <- launch_scenario(id, scenarios[id,], NSIM, dir_out, simula_fun_name)
+      
+      if (!is.null(proc)) {
+        active[[length(active) + 1]] <- list(
+          proc = proc,
+          id = id,
+          start = Sys.time()
+        )
+      } else {
+        completed <- completed + 1  # Era già completato (cached)
       }
-      break
     }
+    
+    if (length(active) == 0) break
+    
+    # 2. Controlla processi attivi
+    still_active <- list()
+    for (w in active) {
+      elapsed <- as.numeric(difftime(Sys.time(), w$start, units = "secs"))
+      
+      if (!w$proc$is_alive()) {
+        # Processo terminato
+        res <- tryCatch(w$proc$get_result(), error = function(e) NULL)
+        if (!is.null(res)) {
+          completed <- completed + 1
+        } else {
+          failed <- failed + 1
+        }
+      } else if (elapsed > timeout_sec) {
+        # Timeout
+        w$proc$kill()
+        failed <- failed + 1
+        cat(sprintf(" [T%d]", w$id))
+      } else {
+        # Ancora attivo
+        still_active[[length(still_active) + 1]] <- w
+      }
+    }
+    active <- still_active
+    
+    # 3. Mostra progresso
+    total_done <- completed + failed
+    total <- length(scenario_ids)
+    elapsed_min <- as.numeric(difftime(Sys.time(), start_total, units = "mins"))
+    cat(sprintf("\r  [%.1fm] %d/%d (ok:%d fail:%d) active:%d queue:%d    ",
+                elapsed_min, total_done, total, completed, failed, 
+                length(active), length(queue)))
     
     Sys.sleep(0.5)
   }
   
-  # Conta successi/fallimenti
-  ok <- 0
-  fail <- 0
-  for (p in procs) {
-    if (is.null(p)) {
-      ok <- ok + 1  # era cached
-    } else {
-      res <- tryCatch(p$get_result(), error = function(e) NULL)
-      if (!is.null(res)) ok <- ok + 1 else fail <- fail + 1
+  cat("\n")
+  list(completed = completed, failed = failed)
+}
+
+# Pool dinamico per scenari DE
+run_pool_DE <- function(scenario_ids, scenarios_DE, dir_out, simula_fun_name, max_workers, timeout_sec) {
+  
+  queue <- scenario_ids
+  active <- list()
+  completed <- 0
+  failed <- 0
+  
+  start_total <- Sys.time()
+  
+  while (length(queue) > 0 || length(active) > 0) {
+    
+    # 1. Lancia nuovi processi
+    while (length(active) < max_workers && length(queue) > 0) {
+      id <- queue[1]
+      queue <- queue[-1]
+      
+      scen_row <- scenarios_DE %>% filter(scenario_id == id)
+      if (nrow(scen_row) == 0) {
+        completed <- completed + 1
+        next
+      }
+      
+      proc <- launch_scenario_DE(id, scen_row, NSIM, dir_out, simula_fun_name)
+      
+      if (!is.null(proc)) {
+        active[[length(active) + 1]] <- list(proc = proc, id = id, start = Sys.time())
+      } else {
+        completed <- completed + 1
+      }
     }
+    
+    if (length(active) == 0) break
+    
+    # 2. Controlla processi
+    still_active <- list()
+    for (w in active) {
+      elapsed <- as.numeric(difftime(Sys.time(), w$start, units = "secs"))
+      
+      if (!w$proc$is_alive()) {
+        res <- tryCatch(w$proc$get_result(), error = function(e) NULL)
+        if (!is.null(res)) completed <- completed + 1 else failed <- failed + 1
+      } else if (elapsed > timeout_sec) {
+        w$proc$kill()
+        failed <- failed + 1
+        cat(sprintf(" [T%d]", w$id))
+      } else {
+        still_active[[length(still_active) + 1]] <- w
+      }
+    }
+    active <- still_active
+    
+    # 3. Progresso
+    total_done <- completed + failed
+    total <- length(scenario_ids)
+    elapsed_min <- as.numeric(difftime(Sys.time(), start_total, units = "mins"))
+    cat(sprintf("\r  [%.1fm] %d/%d (ok:%d fail:%d) active:%d    ",
+                elapsed_min, total_done, total, completed, failed, length(active)))
+    
+    Sys.sleep(0.5)
   }
   
-  list(ok = ok, fail = fail)
+  cat("\n")
+  list(completed = completed, failed = failed)
 }
 
 # =============================================================================
@@ -226,7 +328,7 @@ launch_scenario_DE <- function(scenario_id, scen, nsim, dir_out, simula_fun_name
 # PROCESSAMENTO BATCH PARALLELO
 # =============================================================================
 
-process_scenarios_batch <- function(scenarios, dir_out, simula_fun_name, phase_name) {
+process_scenarios_pool <- function(scenarios, dir_out, simula_fun_name, phase_name) {
   
   cat(sprintf("\n=== %s ===\n", phase_name))
   n_total <- nrow(scenarios)
@@ -244,54 +346,13 @@ process_scenarios_batch <- function(scenarios, dir_out, simula_fun_name, phase_n
     return(NULL)
   }
   
-  start_total <- Sys.time()
-  processed <- 0
-  timeout_count <- 0
+  # Usa pool dinamico
+  results <- run_pool(to_process, scenarios, dir_out, simula_fun_name, MAX_WORKERS, TIMEOUT_SEC)
   
-  # Processa in batch di N_PARALLEL
-  while (length(to_process) > 0) {
-    batch_ids <- head(to_process, N_PARALLEL)
-    to_process <- setdiff(to_process, batch_ids)
-    
-    cat(sprintf("\nBatch di %d scenari (rimanenti: %d)... ", length(batch_ids), length(to_process)))
-    
-    # Lancia TUTTI i processi in parallelo (senza aspettare)
-    procs <- lapply(batch_ids, function(id) {
-      launch_scenario(
-        scenario_id = id,
-        scen = scenarios[id, ],
-        nsim = NSIM,
-        dir_out = dir_out,
-        simula_fun_name = simula_fun_name
-      )
-    })
-    
-    # Aspetta TUTTI con timeout globale
-    results <- wait_processes(procs, TIMEOUT_SEC)
-    batch_ok <- results$ok
-    batch_timeout <- results$fail
-    
-    processed <- processed + batch_ok
-    timeout_count <- timeout_count + batch_timeout
-    
-    cat(sprintf("%d OK, %d timeout\n", batch_ok, batch_timeout))
-    
-    # Progresso
-    completed_now <- length(list.files(dir_out, pattern = "^scenario_[0-9]+\\.rds$"))
-    elapsed <- as.numeric(difftime(Sys.time(), start_total, units = "mins"))
-    if (completed_now > 0) {
-      rate <- elapsed / completed_now
-      remaining <- n_total - completed_now
-      eta <- remaining * rate
-      cat(sprintf("  Progresso: %d/%d | Elapsed: %.1f min | ETA: %.1f min\n", 
-                  completed_now, n_total, elapsed, eta))
-    }
-  }
-  
-  cat(sprintf("\n%s completato: %d processati, %d timeout\n", phase_name, processed, timeout_count))
+  cat(sprintf("\n%s completato: %d OK, %d timeout\n", phase_name, results$completed, results$failed))
 }
 
-process_scenarios_DE_batch <- function(base_results, dir_out, simula_fun_name, phase_name) {
+process_scenarios_DE_pool <- function(base_results, dir_out, simula_fun_name, phase_name) {
   
   cat(sprintf("\n=== %s ===\n", phase_name))
   
@@ -316,39 +377,10 @@ process_scenarios_DE_batch <- function(base_results, dir_out, simula_fun_name, p
     return(NULL)
   }
   
-  start_total <- Sys.time()
-  timeout_count <- 0
+  # Pool dinamico per DE (timeout più lungo)
+  results <- run_pool_DE(to_process_ids, scenarios_DE, dir_out, simula_fun_name, MAX_WORKERS, TIMEOUT_SEC * 2)
   
-  while (length(to_process_ids) > 0) {
-    batch_ids <- head(to_process_ids, N_PARALLEL)
-    to_process_ids <- setdiff(to_process_ids, batch_ids)
-    
-    cat(sprintf("\nBatch DE di %d scenari... ", length(batch_ids)))
-    
-    # Lancia TUTTI i processi DE in parallelo
-    procs <- lapply(batch_ids, function(id) {
-      scen_row <- scenarios_DE %>% filter(scenario_id == id)
-      if (nrow(scen_row) == 0) return(NULL)
-      
-      launch_scenario_DE(
-        scenario_id = id,
-        scen = scen_row,
-        nsim = NSIM,
-        dir_out = dir_out,
-        simula_fun_name = simula_fun_name
-      )
-    })
-    
-    # Aspetta TUTTI con timeout globale (DE può essere più lento)
-    results <- wait_processes(procs, TIMEOUT_SEC * 2)
-    batch_ok <- results$ok
-    batch_timeout <- results$fail
-    timeout_count <- timeout_count + batch_timeout
-    
-    cat(sprintf("%d OK, %d timeout/skip\n", batch_ok, batch_timeout))
-  }
-  
-  cat(sprintf("\n%s completato.\n", phase_name))
+  cat(sprintf("\n%s completato: %d OK, %d timeout\n", phase_name, results$completed, results$failed))
 }
 
 # =============================================================================
@@ -358,7 +390,7 @@ process_scenarios_DE_batch <- function(base_results, dir_out, simula_fun_name, p
 cat("\n========== PAPER 2 POWER - INDIVIDUAL ==========\n")
 start_total <- Sys.time()
 
-process_scenarios_batch(scenarios, dir_out_ind, "simulate_survival_cohort_individual", "STEP 1: Power base Individual")
+process_scenarios_pool(scenarios, dir_out_ind, "simulate_survival_cohort_individual", "STEP 1: Power base Individual")
 
 # Carica risultati base
 base_files <- list.files(dir_out_ind, pattern = "^scenario_[0-9]+\\.rds$", full.names = TRUE)
@@ -366,7 +398,7 @@ if (length(base_files) > 0) {
   results_base_ind <- bind_rows(lapply(base_files, readRDS))
   
   # Step 2: DE
-  process_scenarios_DE_batch(results_base_ind, dir_out_ind, "simulate_survival_cohort_individual", "STEP 2: Power DE Individual")
+  process_scenarios_DE_pool(results_base_ind, dir_out_ind, "simulate_survival_cohort_individual", "STEP 2: Power DE Individual")
   
   # Combina risultati
   de_files <- list.files(dir_out_ind, pattern = "^scenario_DE_[0-9]+\\.rds$", full.names = TRUE)
@@ -389,7 +421,7 @@ if (length(base_files) > 0) {
 
 cat("\n========== PAPER 2 POWER - HOSPITAL ==========\n")
 
-process_scenarios_batch(scenarios, dir_out_hosp, "simulate_survival_cohort_hospital", "STEP 1: Power base Hospital")
+process_scenarios_pool(scenarios, dir_out_hosp, "simulate_survival_cohort_hospital", "STEP 1: Power base Hospital")
 
 # Carica risultati base
 base_files <- list.files(dir_out_hosp, pattern = "^scenario_[0-9]+\\.rds$", full.names = TRUE)
@@ -397,7 +429,7 @@ if (length(base_files) > 0) {
   results_base_hosp <- bind_rows(lapply(base_files, readRDS))
   
   # Step 2: DE
-  process_scenarios_DE_batch(results_base_hosp, dir_out_hosp, "simulate_survival_cohort_hospital", "STEP 2: Power DE Hospital")
+  process_scenarios_DE_pool(results_base_hosp, dir_out_hosp, "simulate_survival_cohort_hospital", "STEP 2: Power DE Hospital")
   
   # Combina risultati
   de_files <- list.files(dir_out_hosp, pattern = "^scenario_DE_[0-9]+\\.rds$", full.names = TRUE)
