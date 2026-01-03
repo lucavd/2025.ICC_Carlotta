@@ -1,11 +1,11 @@
 # =============================================================================
 # run_paper2_power_callr.R - Paper 2 Power con timeout REALE via callr
-# 20 scenari paralleli, timeout 180s per scenario
+# 10 scenari paralleli, timeout 180s per scenario
 # =============================================================================
 
 cat("\n=== PAPER 2 POWER CON TIMEOUT CALLR ===\n")
 cat("Timeout per scenario: 180 secondi\n")
-cat("20 scenari in parallelo\n\n")
+cat("10 scenari in parallelo\n\n")
 
 library(callr)
 library(dplyr)
@@ -15,7 +15,7 @@ source("02_functions.R")
 # Parametri
 TIMEOUT_SEC <- 180
 NSIM <- PAPER2_POWER_NSIM  # 1000
-N_PARALLEL <- 20
+N_PARALLEL <- 10
 
 # Directory output
 dir_out_ind <- DIR_PAPER2_POWER_IND
