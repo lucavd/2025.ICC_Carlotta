@@ -1,11 +1,11 @@
 # =============================================================================
 # run_paper2_power_callr.R - Paper 2 Power con timeout REALE via callr
-# Pool dinamico: max 10 worker, timeout 5 min per processo
+# Pool dinamico: max 20 worker, timeout 10 min per processo
 # =============================================================================
 
 cat("\n=== PAPER 2 POWER CON TIMEOUT CALLR ===\n")
-cat("Pool dinamico: max 10 worker\n")
-cat("Timeout per processo: 5 minuti\n\n")
+cat("Pool dinamico: max 20 worker\n")
+cat("Timeout per processo: 10 minuti\n\n")
 
 library(callr)
 library(dplyr)
@@ -13,9 +13,9 @@ source("01_config.R")
 source("02_functions.R")
 
 # Parametri
-TIMEOUT_SEC <- 300  # 5 minuti per processo
+TIMEOUT_SEC <- 600  # 10 minuti per processo
 NSIM <- PAPER2_POWER_NSIM  # 1000
-MAX_WORKERS <- 10
+MAX_WORKERS <- 20
 
 # Directory output
 dir_out_ind <- DIR_PAPER2_POWER_IND
