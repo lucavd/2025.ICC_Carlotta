@@ -185,21 +185,25 @@ simulate_survival_cohort_individual <- function(num_hosp,
   
   if (balancing_mode == 2) {
     mean_size <- sample_size / num_hosp
-    pattern_name <- paste0("fixed_var_factor_", num_hosp)
-   ## pattern_name <- paste0("fixed_var_factor_", num_hosp, "_", sample_size) eventuale modifica
+   ## pattern_name <- paste0("fixed_var_factor_", num_hosp)
+   
     
-    if (!exists(pattern_name, envir = .GlobalEnv)) {
-      set.seed(num_hosp)
-      assign(pattern_name, runif(num_hosp, 0.5, 1.5), envir = .GlobalEnv)
-    }
+   ## if (!exists(pattern_name, envir = .GlobalEnv)) {
+   ##   set.seed(num_hosp)
+   ##  assign(pattern_name, runif(num_hosp, 0.5, 1.5), envir = .GlobalEnv)
+   ##  }
     
-    var_factor <- get(pattern_name, envir = .GlobalEnv)
-    num_pat_group <- mean_size * var_factor
-    num_pat_group <- num_pat_group / sum(num_pat_group) * sample_size
-    num_pat_group <- round(num_pat_group)
-    num_pat_group[num_pat_group <= 0] <- 1
-    
-    diff <- sample_size - sum(num_pat_group)
+   ## var_factor <- get(pattern_name, envir = .GlobalEnv)
+  var_factor <- rgamma(num_hosp, shape = 1 / 0.3^2, scale = 0.3^2)
+  var_factor <- var_factor / mean(var_factor)
+
+  num_pat_group <- mean_size * var_factor
+  num_pat_group <- num_pat_group / sum(num_pat_group) * sample_size
+  num_pat_group <- round(num_pat_group)
+
+  num_pat_group[num_pat_group <= 0] <- 1
+
+diff <- sample_size - sum(num_pat_group)
     if (diff != 0) {
       if (diff > 0) {
         adjust_index <- sample(1:num_hosp, 1)
@@ -243,7 +247,7 @@ simulate_survival_cohort_individual <- function(num_hosp,
   cohort$icc <- as.numeric(icc[1])
   cohort$cens_prop <- mean(cohort$status == 0)
   
-  cohort[] <- lapply(cohort, function(x) if (is.numeric(x)) round(x, 6) else x) ##round 6
+  # cohort[] <- lapply(cohort, function(x) if (is.numeric(x)) round(x, 3) else x) meglio non arrotondare subito per variabilità
   
   return(cohort)
 }
@@ -266,24 +270,27 @@ simulate_survival_cohort_hospital <- function(num_hosp,
     if (resto > 0) num_pat_group[1:resto] <- num_pat_group[1:resto] + 1
   } 
   
-  if (balancing_mode == 2) {
+  i if (balancing_mode == 2) {
     mean_size <- sample_size / num_hosp
-    pattern_name <- paste0("fixed_var_factor_", num_hosp)
-   ## pattern_name <- paste0("fixed_var_factor_", num_hosp, "_", sample_size) eventuale modifica
+   ## pattern_name <- paste0("fixed_var_factor_", num_hosp)
+   
+    
+   ## if (!exists(pattern_name, envir = .GlobalEnv)) {
+   ##   set.seed(num_hosp)
+   ##  assign(pattern_name, runif(num_hosp, 0.5, 1.5), envir = .GlobalEnv)
+   ##  }
+    
+   ## var_factor <- get(pattern_name, envir = .GlobalEnv)
+  var_factor <- rgamma(num_hosp, shape = 1 / 0.3^2, scale = 0.3^2)
+  var_factor <- var_factor / mean(var_factor)
 
-    
-    if (!exists(pattern_name, envir = .GlobalEnv)) {
-      set.seed(num_hosp)
-      assign(pattern_name, runif(num_hosp, 0.5, 1.5), envir = .GlobalEnv)
-    }
-    
-    var_factor <- get(pattern_name, envir = .GlobalEnv)
-    num_pat_group <- mean_size * var_factor
-    num_pat_group <- num_pat_group / sum(num_pat_group) * sample_size
-    num_pat_group <- round(num_pat_group)
-    num_pat_group[num_pat_group <= 0] <- 1
-    
-    diff <- sample_size - sum(num_pat_group)
+  num_pat_group <- mean_size * var_factor
+  num_pat_group <- num_pat_group / sum(num_pat_group) * sample_size
+  num_pat_group <- round(num_pat_group)
+
+  num_pat_group[num_pat_group <= 0] <- 1
+
+diff <- sample_size - sum(num_pat_group)
     if (diff != 0) {
       if (diff > 0) {
         adjust_index <- sample(1:num_hosp, 1)
@@ -332,7 +339,7 @@ simulate_survival_cohort_hospital <- function(num_hosp,
   cohort$icc <- as.numeric(icc[1])
   cohort$cens_prop <- mean(cohort$status == 0)
   
-  cohort[] <- lapply(cohort, function(x) if (is.numeric(x)) round(x, 6) else x) ##round 6
+  # cohort[] <- lapply(cohort, function(x) if (is.numeric(x)) round(x, 3) else x) 
   
   return(cohort)
 }
