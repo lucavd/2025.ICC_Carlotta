@@ -186,6 +186,7 @@ simulate_survival_cohort_individual <- function(num_hosp,
   if (balancing_mode == 2) {
     mean_size <- sample_size / num_hosp
     pattern_name <- paste0("fixed_var_factor_", num_hosp)
+   ## pattern_name <- paste0("fixed_var_factor_", num_hosp, "_", sample_size) eventuale modifica
     
     if (!exists(pattern_name, envir = .GlobalEnv)) {
       set.seed(num_hosp)
@@ -242,7 +243,7 @@ simulate_survival_cohort_individual <- function(num_hosp,
   cohort$icc <- as.numeric(icc[1])
   cohort$cens_prop <- mean(cohort$status == 0)
   
-  cohort[] <- lapply(cohort, function(x) if (is.numeric(x)) round(x, 3) else x)
+  cohort[] <- lapply(cohort, function(x) if (is.numeric(x)) round(x, 6) else x) ##round 6
   
   return(cohort)
 }
@@ -268,6 +269,8 @@ simulate_survival_cohort_hospital <- function(num_hosp,
   if (balancing_mode == 2) {
     mean_size <- sample_size / num_hosp
     pattern_name <- paste0("fixed_var_factor_", num_hosp)
+   ## pattern_name <- paste0("fixed_var_factor_", num_hosp, "_", sample_size) eventuale modifica
+
     
     if (!exists(pattern_name, envir = .GlobalEnv)) {
       set.seed(num_hosp)
@@ -329,7 +332,7 @@ simulate_survival_cohort_hospital <- function(num_hosp,
   cohort$icc <- as.numeric(icc[1])
   cohort$cens_prop <- mean(cohort$status == 0)
   
-  cohort[] <- lapply(cohort, function(x) if (is.numeric(x)) round(x, 3) else x)
+  cohort[] <- lapply(cohort, function(x) if (is.numeric(x)) round(x, 6) else x) ##round 6
   
   return(cohort)
 }
