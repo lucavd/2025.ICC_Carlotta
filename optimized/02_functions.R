@@ -270,7 +270,7 @@ simulate_survival_cohort_hospital <- function(num_hosp,
     if (resto > 0) num_pat_group[1:resto] <- num_pat_group[1:resto] + 1
   } 
   
-  i if (balancing_mode == 2) {
+  if (balancing_mode == 2) {
     mean_size <- sample_size / num_hosp
    ## pattern_name <- paste0("fixed_var_factor_", num_hosp)
    
