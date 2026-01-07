@@ -42,8 +42,8 @@ setup_parallel <- function(n_workers = N_CORES) {
 
 # --- Directory output ---
 DIR_BASE <- "results_optimized"
-DIR_PAPER1_IND <- file.path(DIR_BASE, "paper1_icc_individual")
-DIR_PAPER1_HOSP <- file.path(DIR_BASE, "paper1_icc_hospital")
+DIR_PAPER1_IND <- file.path(DIR_BASE, "paper1_icc_individual_unb")
+DIR_PAPER1_HOSP <- file.path(DIR_BASE, "paper1_icc_hospital_unb")
 DIR_PAPER2_POWER_IND <- file.path(DIR_BASE, "paper2_power_individual")
 DIR_PAPER2_POWER_HOSP <- file.path(DIR_BASE, "paper2_power_hospital")
 DIR_PAPER2_SS <- file.path(DIR_BASE, "paper2_sample_size")
@@ -82,7 +82,7 @@ PAPER1_PARAMS <- list(
   num_hosps = c(5, 30, 60),           # RIDOTTO: tolto 15 → 3 livelli
   iccs = c(0.01, 0.1, 0.3),           # RIDOTTO: tolto 0.06 → 3 livelli (basso, medio, alto)
   cens_values = c(0.5, 5),            # mantenuti (alta e bassa censura)
-  balancing_modes = c(1, 2)           # mantenuti (bilanciato, sbilanciato)
+  balancing_modes = 2 #c(1, 2)           # mantenuti (bilanciato, sbilanciato)
 )
 # Nuovi scenari: 2*2*3*3*3*2*2 = 432 per disegno = 864 totali
 # Con n_rep = 1000: 864,000 simulazioni (vs 3,072,000 originali) → -72%
