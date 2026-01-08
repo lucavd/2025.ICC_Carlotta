@@ -61,6 +61,7 @@ process_power_scenario <- function(scenario_id, scen, nsim, dir_out, simula_fun)
       num_pat_group_mean = scen$sample_size / scen$num_hosp,
       sample_size = scen$sample_size,
       power = NA_real_,
+      cv = NA_real_,    # AGGIUNTO
       prop_cens = NA_real_
     )
   }
@@ -69,6 +70,7 @@ process_power_scenario <- function(scenario_id, scen, nsim, dir_out, simula_fun)
   res <- res %>%
     mutate(
       scenario_id = scenario_id,
+      cv = if (!"cv" %in% names(.)) NA_real_ else cv, ## aggiunto
       pop_treat_effect = scen$pop_treat_effect,
       lambda = scen$lambda,
       cens = scen$cens,
