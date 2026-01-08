@@ -60,7 +60,7 @@ process_icc_scenario <- function(scenario_id, scen, n_rep, chunk_size,
   }
   
   # Esegui con chunking
-  rep_results <- run_with_chunks(
+  rep_results <- run_with_chunks_parallel( ## modificato
     scenario_id = sprintf("%03d", scenario_id),
     n_rep = n_rep,
     chunk_size = chunk_size,
