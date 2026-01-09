@@ -662,13 +662,14 @@ surv_power_function <- function(simula_coorte_fun, simula_args = list(), nsim = 
   p_values_icc <- numeric(nsim)
   significant <- logical(nsim)
   prop_cens <- numeric(nsim)
+  cv_empirico_vec <- numeric(nsim)
   
   for (i in 1:nsim) {
     cohort <- do.call(simula_coorte_fun, simula_args)
 
     # Calcolo CV dei cluster (dimensioni ospedali) ###DA AGGIUNGERE
     cluster_sizes <- table(cohort$hospital) ## QUESTO
-    cv_empirico <- sd(cluster_sizes) / mean(cluster_sizes)  ## QUESTO
+    cv_empirico_vec[i] <- sd(cluster_sizes) / mean(cluster_sizes)  ## QUESTO
     
     if (i == 1) {
       sigma_hosp <- unique(cohort$sigma_hosp)
@@ -679,7 +680,7 @@ surv_power_function <- function(simula_coorte_fun, simula_args = list(), nsim = 
     }
     
     prop_cens[i] <- mean(cohort$status == 0, na.rm = TRUE)
-    
+        
     mod_icc <- coxph(Surv(eventtime, status) ~ treat + cluster(hospital), data = cohort)
     p_val_icc <- summary(mod_icc)$coefficients["treat", "Pr(>|z|)"]
     p_values_icc[i] <- p_val_icc
@@ -687,6 +688,7 @@ surv_power_function <- function(simula_coorte_fun, simula_args = list(), nsim = 
   }
   
   power <- mean(significant)
+  cv <- mean(cv_empirico_vec)
   prop_cens_mean <- mean(prop_cens, na.rm = TRUE)
   
   tibble(
@@ -696,7 +698,7 @@ surv_power_function <- function(simula_coorte_fun, simula_args = list(), nsim = 
     num_pat_group_mean = num_pat_group_mean,
     sample_size = sample_size,
     power = power,
-    cv = cv_empirico, ###AGGIUNGERE SOLO QUESTO
+    cv = cv, ###AGGIUNGERE SOLO QUESTO
     prop_cens = prop_cens_mean
   )
 }
