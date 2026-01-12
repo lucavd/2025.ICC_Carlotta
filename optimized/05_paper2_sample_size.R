@@ -59,7 +59,8 @@ process_ss_scenario <- function(scenario_id, scen, nsim, max_n,
       balancing_mode = scen$balancing_mode,
       num_pat_group = NA_integer_,
       sample_size = NA_integer_,
-      power = NA_real_
+      power = NA_real_,
+      cv = NA_real_
     )
   }
   
