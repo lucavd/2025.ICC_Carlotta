@@ -166,6 +166,7 @@ is_scenario_complete <- function(scenario_id, n_rep, chunk_size, dir_out) {
 # FUNZIONI DI SIMULAZIONE (da Paper Functions – Nov 2025.R)
 # =============================================================================
 
+
 # 1A) Simulate survival cohort - INDIVIDUAL design
 # Entrambi i trattamenti presenti in ogni ospedale (50/50 split)
 simulate_survival_cohort_individual <- function(num_hosp, 
@@ -247,6 +248,8 @@ diff <- sample_size - sum(num_pat_group)
   cohort$icc <- as.numeric(icc[1])
   cohort$cens_prop <- mean(cohort$status == 0)
   
+  cluster_sizes <- table(cohort$hospital)
+  cohort$cv <- sd(cluster_sizes) / mean(cluster_sizes)
   # cohort[] <- lapply(cohort, function(x) if (is.numeric(x)) round(x, 3) else x) meglio non arrotondare subito per variabilità
   
   return(cohort)
@@ -338,6 +341,9 @@ diff <- sample_size - sum(num_pat_group)
   cohort$sigma_hosp <- as.numeric(sigma_hosp[1])
   cohort$icc <- as.numeric(icc[1])
   cohort$cens_prop <- mean(cohort$status == 0)
+  
+  cluster_sizes <- table(cohort$hospital)
+  cohort$cv <- sd(cluster_sizes) / mean(cluster_sizes)
   
   # cohort[] <- lapply(cohort, function(x) if (is.numeric(x)) round(x, 3) else x) 
   
@@ -662,13 +668,14 @@ surv_power_function <- function(simula_coorte_fun, simula_args = list(), nsim = 
   p_values_icc <- numeric(nsim)
   significant <- logical(nsim)
   prop_cens <- numeric(nsim)
+  cv_empirico_vec <- numeric(nsim)
   
   for (i in 1:nsim) {
     cohort <- do.call(simula_coorte_fun, simula_args)
 
     # Calcolo CV dei cluster (dimensioni ospedali) ###DA AGGIUNGERE
     cluster_sizes <- table(cohort$hospital) ## QUESTO
-    cv_empirico <- sd(cluster_sizes) / mean(cluster_sizes)  ## QUESTO
+    cv_empirico_vec[i] <- sd(cluster_sizes) / mean(cluster_sizes)  ## QUESTO
     
     if (i == 1) {
       sigma_hosp <- unique(cohort$sigma_hosp)
@@ -679,7 +686,7 @@ surv_power_function <- function(simula_coorte_fun, simula_args = list(), nsim = 
     }
     
     prop_cens[i] <- mean(cohort$status == 0, na.rm = TRUE)
-    
+        
     mod_icc <- coxph(Surv(eventtime, status) ~ treat + cluster(hospital), data = cohort)
     p_val_icc <- summary(mod_icc)$coefficients["treat", "Pr(>|z|)"]
     p_values_icc[i] <- p_val_icc
@@ -687,6 +694,7 @@ surv_power_function <- function(simula_coorte_fun, simula_args = list(), nsim = 
   }
   
   power <- mean(significant)
+  cv <- mean(cv_empirico_vec)
   prop_cens_mean <- mean(prop_cens, na.rm = TRUE)
   
   tibble(
@@ -696,7 +704,7 @@ surv_power_function <- function(simula_coorte_fun, simula_args = list(), nsim = 
     num_pat_group_mean = num_pat_group_mean,
     sample_size = sample_size,
     power = power,
-    cv = cv_empirico, ###AGGIUNGERE SOLO QUESTO
+    cv = cv, ###AGGIUNGERE SOLO QUESTO
     prop_cens = prop_cens_mean
   )
 }
@@ -718,6 +726,7 @@ sample_size_icc_binary <- function(icc, num_hosp, pop_treat_effect,
   # Funzione per stimare power dato n per gruppo
   estimate_power <- function(npt) {
     significant <- logical(nsim)
+    cv <- NA_real_  # inizializza cv
     
     for (i in 1:nsim) {
       cohort <- tryCatch({
@@ -743,9 +752,13 @@ sample_size_icc_binary <- function(icc, num_hosp, pop_treat_effect,
         p_val <- summary(mod)$coefficients["treat", "Pr(>|z|)"]
         significant[i] <- p_val < 0.05
       }
+      
+      # Aggiorna cv ad ogni iterazione valida
+      cv <- unique(cohort$cv)
     }
     
-    mean(significant, na.rm = TRUE)
+    # Ritorna power e cv dell'ultima cohort valida
+    list(power = mean(significant, na.rm = TRUE), cv = cv)
   }
   
   # Binary search
@@ -753,9 +766,13 @@ sample_size_icc_binary <- function(icc, num_hosp, pop_treat_effect,
   high <- max_n
   result_n <- NA
   result_power <- NA
+  cv <- NA_real_   # inizializza cv
   
   # Prima verifica se max_n è sufficiente
-  power_max <- estimate_power(high)
+  res <- estimate_power(high)
+  power_max <- res$power
+  cv <- res$cv
+  
   if (power_max < target_power) {
     message(sprintf("Attenzione: power = %.2f con n = %d < target %.2f", 
                     power_max, high, target_power))
@@ -765,7 +782,9 @@ sample_size_icc_binary <- function(icc, num_hosp, pop_treat_effect,
     # Binary search
     while (high - low > 1) {
       mid <- floor((low + high) / 2)
-      power_mid <- estimate_power(mid)
+      res_mid <- estimate_power(mid)
+      power_mid <- res_mid$power
+      cv <- res_mid$cv   # aggiorna CV ogni volta
       
       message(sprintf("  n = %d, power = %.3f", mid, power_mid))
       
@@ -780,11 +799,14 @@ sample_size_icc_binary <- function(icc, num_hosp, pop_treat_effect,
     
     # Affina con ultimo check
     if (is.na(result_n)) {
+      res_last <- estimate_power(high)
       result_n <- high
-      result_power <- estimate_power(high)
+      result_power <- res_last$power
+      cv <- res_last$cv
     }
   }
   
+  # Costruzione tibble finale
   tibble(
     nsim = nsim,
     icc = icc,
@@ -795,6 +817,7 @@ sample_size_icc_binary <- function(icc, num_hosp, pop_treat_effect,
     balancing_mode = balancing_mode,
     num_pat_group = result_n,
     sample_size = result_n * num_hosp,
-    power = result_power
+    power = result_power,
+    cv = cv
   )
 }

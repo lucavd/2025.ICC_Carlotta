@@ -82,7 +82,7 @@ PAPER1_PARAMS <- list(
   num_hosps = c(5, 30, 60),           # RIDOTTO: tolto 15 → 3 livelli
   iccs = c(0.01, 0.1, 0.3),           # RIDOTTO: tolto 0.06 → 3 livelli (basso, medio, alto)
   cens_values = c(0.5, 5),            # mantenuti (alta e bassa censura)
-  balancing_modes = 2 #c(1, 2)           # mantenuti (bilanciato, sbilanciato)
+  balancing_modes = c(1, 2)           # mantenuti (bilanciato, sbilanciato)
 )
 # Nuovi scenari: 2*2*3*3*3*2*2 = 432 per disegno = 864 totali
 # Con n_rep = 1000: 864,000 simulazioni (vs 3,072,000 originali) → -72%
@@ -123,7 +123,7 @@ PAPER2_POWER_PARAMS <- list(
   num_hosps = c(5, 15, 60),                 # RIDOTTO: 3 livelli (tolto 30)
   sample_sizes = c(100, 500, 2000, 6000),   # mantenuti 4
   cens_values = c(0.5, 5),                  # RIDOTTO: 2 livelli (tolto 2)
-  balancing_modes = 2 #c(1, 2) ## modifica momentanea solo per correzione DE_CV
+  balancing_modes = c(1, 2) 
 )
 # Nuovi scenari: 2*2*5*3*4*2*2 = 960 per disegno
 # Con nsim = 1000: 960,000 sim per disegno (vs 5,376,000) → -82%
