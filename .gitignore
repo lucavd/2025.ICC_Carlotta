@@ -3,3 +3,14 @@
 .RData
 .Ruserdata
 nohup.out
+# File temporanei da ignorare
+test_*.R
+temp_*.R
+check_*.R
+combine_*.R
+run_*_sequential.R
+run_parallel_*.R
+launch_*_new.bat
+launch_*_26.bat
+launch_paper1_icc.bat
+watchdog_*.ps1
