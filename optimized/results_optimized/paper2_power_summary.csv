@@ -1,0 +1,3 @@
+"design","n_scenarios","n_valid","n_na","power_mean","power_median","power_min","power_max"
+"hospital",954,590,364,0.541,0.524,0.066,1
+"individual",958,918,40,0.738,0.958,0.088,1
