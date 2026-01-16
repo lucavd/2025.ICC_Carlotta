@@ -150,9 +150,9 @@ make_paper2_power_scenarios <- function() {
 # ORIGINALE: nsim = 2000 × ~40 step di ricerca = ~80,000 sim per scenario, 96 scenari
 # OTTIMIZZATO: nsim = 500, binary search invece di +1, early stopping
 
-PAPER2_SS_NSIM <- 500      # ORIGINALE: 2000. Ridotto (per ricerca iterativa basta meno)
-PAPER2_SS_MAX_PAT <- 300   # ORIGINALE: 500. Ridotto
-PAPER2_SS_TIMEOUT <- 180   # secondi timeout per scenario
+PAPER2_SS_NSIM <- 1000      # ORIGINALE: 2000. Ridotto (per ricerca iterativa basta meno)
+PAPER2_SS_MAX_PAT <- 3000   # ORIGINALE: 500. Ridotto ## eliminato limiti
+PAPER2_SS_TIMEOUT <- 180000   # secondi timeout per scenario
 
 # Grid ORIGINALE: 96 scenari
 # Grid RIDOTTA (scenari più informativi):
@@ -160,7 +160,7 @@ PAPER2_SS_PARAMS <- list(
   pte_values = c(-0.2, -0.5),
   lambda_values = c(0.115, 0.012),
   n_hosp_values = c(5, 30, 60),       # ESTESO: aggiungo 30 per coprire meglio
-  icc_values = c(0, 0.01, 0.05, 0.1), # 4 livelli
+  icc_values = c(0, 0.01, 0.05, 0.1, 0.3), #5 livelli, aggiunto 0.3
   cens_values = c(0.5, 5),
   balancing_modes = c(1, 2)
 )
