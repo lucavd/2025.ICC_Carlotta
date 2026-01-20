@@ -14,7 +14,7 @@ create_dirs()
 setup_parallel(N_CORES)
 
 # =============================================================================
-# FUNZIONE PER PROCESSARE UN SINGOLO SCENARIO SAMPLE SIZE
+# FUNZIONE PER PROCESSARE UN SINGOLO SCENARIO SAMPLE SIZE - individual
 # =============================================================================
 
 process_ss_scenario <- function(scenario_id, scen, nsim, max_n, 
@@ -114,6 +114,67 @@ run_paper2_ss_individual <- function() {
 
 
 # =============================================================================
+# FUNZIONE PER PROCESSARE UN SINGOLO SCENARIO SAMPLE SIZE - hospital
+# =============================================================================
+
+process_ss_scenario <- function(scenario_id, scen, nsim, max_n, 
+                                 dir_out, simula_fun) {
+  
+  filename <- file.path(dir_out, sprintf("scenario_%03d.rds", scenario_id))
+  
+  if (file.exists(filename)) {
+    return(readRDS(filename))
+  }
+  
+  message(sprintf(">>> Sample size scenario %d | icc=%.2f, hosp=%d, effect=%.1f",
+                  scenario_id, scen$icc, scen$num_paz, scen$pop_treat_effect))
+  
+  res <- tryCatch({
+    sample_hosp_size_binary(
+      icc = scen$icc,
+      n_per_hosp = scen$num_paz,
+      pop_treat_effect = scen$pop_treat_effect,
+      nsim = nsim,
+      min_hosp = 2,
+      max_hosp = max_n,
+      target_power = 0.8,
+      lambda = scen$lambda,
+      cens = scen$cens,
+      balancing_mode = scen$balancing_mode,
+      simula_fun = simula_fun
+    )
+  }, error = function(e) {
+    message(sprintf("Errore scenario %d: %s", scenario_id, e$message))
+    NULL
+  })
+  
+  if (is.null(res)) {
+    res <- tibble(
+      nsim = nsim,
+      icc = scen$icc,
+      n_per_hosp = scen$num_paz,
+      lambda = scen$lambda,
+      cens = scen$cens,
+      pop_treat_effect = scen$pop_treat_effect,
+      balancing_mode = scen$balancing_mode,
+      num_hosp_needed = NA_integer_,
+      sample_size = NA_integer_,
+      power = NA_real_,
+      cv = NA_real_
+    )
+  }
+  
+  res <- res %>%
+    mutate(scenario_id = scenario_id)
+  
+  saveRDS(res, filename)
+  return(res)
+}
+
+
+
+
+# =============================================================================
 # RUN PAPER 2 SAMPLE SIZE - DESIGN HOSPITAL
 # =============================================================================
 
@@ -121,7 +182,7 @@ run_paper2_ss_hospital <- function() {
   
   cat("\n========== PAPER 2 SAMPLE SIZE - DESIGN HOSPITAL ==========\n")
   
-  scenarios <- make_paper2_ss_scenarios()
+  scenarios <- make_paper2_ss_scenarios_hosp()
   cat(sprintf("Scenari: %d\n", nrow(scenarios)))
   cat(sprintf("nsim per step: %d\n", PAPER2_SS_NSIM))
   cat(sprintf("Max n per gruppo: %d\n", PAPER2_SS_MAX_PAT))
