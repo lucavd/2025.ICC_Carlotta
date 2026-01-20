@@ -193,7 +193,7 @@ run_paper2_ss_hospital <- function() {
     p <- progressor(steps = nrow(scenarios))
     
     results <- future_map(1:nrow(scenarios), function(i) {
-      res <- process_ss_scenario(
+      res <- process_ss_scenario_hosp(
         scenario_id = i,
         scen = scenarios[i, ],
         nsim = PAPER2_SS_NSIM,
