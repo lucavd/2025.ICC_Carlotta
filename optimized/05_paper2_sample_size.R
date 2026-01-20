@@ -117,7 +117,7 @@ run_paper2_ss_individual <- function() {
 # FUNZIONE PER PROCESSARE UN SINGOLO SCENARIO SAMPLE SIZE - hospital
 # =============================================================================
 
-process_ss_scenario <- function(scenario_id, scen, nsim, max_n, 
+process_ss_scenario_hosp <- function(scenario_id, scen, nsim, max_n, 
                                  dir_out, simula_fun) {
   
   filename <- file.path(dir_out, sprintf("scenario_%03d.rds", scenario_id))
@@ -149,20 +149,18 @@ process_ss_scenario <- function(scenario_id, scen, nsim, max_n,
   })
   
   if (is.null(res)) {
-    res <- tibble(
-      nsim = nsim,
-      icc = scen$icc,
-      n_per_hosp = scen$num_paz,
-      lambda = scen$lambda,
-      cens = scen$cens,
-      pop_treat_effect = scen$pop_treat_effect,
-      balancing_mode = scen$balancing_mode,
-      num_hosp_needed = NA_integer_,
-      sample_size = NA_integer_,
-      power = NA_real_,
-      cv = NA_real_
-    )
-  }
+res <- tibble(
+    nsim = nsim,
+    icc = scen$icc,
+    pop_treat_effect = scen$pop_treat_effect,
+    balancing_mode = scen$balancing_mode,
+    num_pat_group = scen$num_paz,  # Coerenza con output funzione
+    num_hosp = NA_integer_,        # Coerenza con output funzione
+    sample_size = NA_integer_,
+    power = NA_real_,
+    cv = NA_real_
+  )
+}
   
   res <- res %>%
     mutate(scenario_id = scenario_id)
