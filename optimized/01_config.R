@@ -79,26 +79,42 @@ PAPER1_PARAMS <- list(
   betas = c(-0.2, -0.5),              # HR 0.8, 0.6 (entrambi importanti)
   lambdas = c(0.115, 0.012),          # mediana 6m, 60m (entrambi)
   sample_sizes = c(100, 500, 2000),   # RIDOTTO: tolto 1000, 6000 → 3 livelli
-  num_hosps = c(5, 30, 60),           # RIDOTTO: tolto 15 → 3 livelli
   iccs = c(0.01, 0.1, 0.3),           # RIDOTTO: tolto 0.06 → 3 livelli (basso, medio, alto)
   cens_values = c(0.5, 5),            # mantenuti (alta e bassa censura)
   balancing_modes = c(1, 2)           # mantenuti (bilanciato, sbilanciato)
+  ##specifici
+  num_hosps = c(5, 30, 60),           # Ospedali fissi per Individual
+  n_pat_hosp = c(20, 50, 100)         # Pazienti fissi per Hospital
 )
 # Nuovi scenari: 2*2*3*3*3*2*2 = 432 per disegno = 864 totali
 # Con n_rep = 1000: 864,000 simulazioni (vs 3,072,000 originali) → -72%
 
 # Genera grid Paper 1
-make_paper1_scenarios <- function() {
+# Griglia per Design INDIVIDUAL (cerca N pazienti)
+make_scenarios_individual <- function() {
   expand.grid(
-    beta = PAPER1_PARAMS$betas,
-    lambda = PAPER1_PARAMS$lambdas,
-    sample_size = PAPER1_PARAMS$sample_sizes,
-    num_hosp = PAPER1_PARAMS$num_hosps,
-    icc = PAPER1_PARAMS$iccs,
-    cens = PAPER1_PARAMS$cens_values,
-    balancing_mode = PAPER1_PARAMS$balancing_modes,
+    pop_treat_effect = PAPER2_SS_PARAMS$pte_values,
+    lambda = PAPER2_SS_PARAMS$lambda_values,
+    num_hosp = PAPER2_SS_PARAMS$num_hosp,
+    icc = PAPER2_SS_PARAMS$icc_values,
+    cens = PAPER2_SS_PARAMS$cens_values,
+    balancing_mode = PAPER2_SS_PARAMS$balancing_modes,
     stringsAsFactors = FALSE
   )
+}
+
+# Griglia per Design HOSPITAL (cerca N ospedali)
+make_scenarios_hospital <- function() {
+  expand.grid(
+    pop_treat_effect = PAPER2_SS_PARAMS$pte_values,
+    lambda = PAPER2_SS_PARAMS$lambda_values,
+    num_hosp = PAPER2_SS_PARAMS$n_pat_hosp,
+    icc = PAPER2_SS_PARAMS$icc_values,
+    cens = PAPER2_SS_PARAMS$cens_values,
+    balancing_mode = PAPER2_SS_PARAMS$balancing_modes,
+    stringsAsFactors = FALSE
+  )
+}
 }
 
 # -----------------------------------------------------------------------------
