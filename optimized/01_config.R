@@ -120,7 +120,7 @@ PAPER2_POWER_PARAMS <- list(
   treat_effects = c(-0.2, -0.5),
   lambdas = c(0.115, 0.012),
   icc_values = c(0, 0.01, 0.05, 0.1, 0.3),  # RIDOTTO: 5 livelli (tolti duplicati, 0.02, 0.03)
-  num_hosps = c(5, 15, 60),                 # RIDOTTO: 3 livelli (tolto 30)
+  num_hosps = c(5, 30, 60),                 # RIDOTTO: 3 livelli (tolto 30)
   sample_sizes = c(100, 500, 2000, 6000),   # mantenuti 4
   cens_values = c(0.5, 5),                  # RIDOTTO: 2 livelli (tolto 2)
   balancing_modes = c(1, 2) 
