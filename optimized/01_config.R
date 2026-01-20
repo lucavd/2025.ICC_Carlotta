@@ -82,12 +82,12 @@ PAPER1_PARAMS <- list(
   num_hosps = c(5, 30, 60),           # RIDOTTO: tolto 15 → 3 livelli
   iccs = c(0.01, 0.1, 0.3),           # RIDOTTO: tolto 0.06 → 3 livelli (basso, medio, alto)
   cens_values = c(0.5, 5),            # mantenuti (alta e bassa censura)
-  balancing_modes = c(1, 2)           # mantenuti (bilanciato, sbilanciato)
-)
+  balancing_modes = c(1, 2)          # mantenuti (bilanciato, sbilanciato)
+  )
 # Nuovi scenari: 2*2*3*3*3*2*2 = 432 per disegno = 864 totali
 # Con n_rep = 1000: 864,000 simulazioni (vs 3,072,000 originali) → -72%
 
-# Genera grid Paper 1
+# Genera grid Paper 1 
 make_paper1_scenarios <- function() {
   expand.grid(
     beta = PAPER1_PARAMS$betas,
@@ -100,6 +100,8 @@ make_paper1_scenarios <- function() {
     stringsAsFactors = FALSE
   )
 }
+
+
 
 # -----------------------------------------------------------------------------
 # PAPER 2 - Power
@@ -162,15 +164,28 @@ PAPER2_SS_PARAMS <- list(
   n_hosp_values = c(5, 30, 60),       # ESTESO: aggiungo 30 per coprire meglio
   icc_values = c(0, 0.01, 0.05, 0.1, 0.3), #5 livelli, aggiunto 0.3
   cens_values = c(0.5, 5),
-  balancing_modes = c(1, 2)
+  balancing_modes = c(1, 2),
+  n_per_hosp = c(20, 50, 100)         # numero pazienti per ospedale
 )
 # Nuovi scenari: 2*2*3*4*2*2 = 192 scenari (più che originale, ma con meno sim/scenario)
 
-make_paper2_ss_scenarios <- function() {
+make_paper2_ss_scenarios <- function() {  ## individual
   expand.grid(
     pop_treat_effect = PAPER2_SS_PARAMS$pte_values,
     lambda = PAPER2_SS_PARAMS$lambda_values,
     num_hosp = PAPER2_SS_PARAMS$n_hosp_values,
+    icc = PAPER2_SS_PARAMS$icc_values,
+    cens = PAPER2_SS_PARAMS$cens_values,
+    balancing_mode = PAPER2_SS_PARAMS$balancing_modes,
+    stringsAsFactors = FALSE
+  )
+}
+
+make_paper2_ss_scenarios_hosp <- function() {  ## hospital
+  expand.grid(
+    pop_treat_effect = PAPER2_SS_PARAMS$pte_values,
+    lambda = PAPER2_SS_PARAMS$lambda_values,
+    num_paz = PAPER2_SS_PARAMS$n_per_hosp, ## ora cerco quanti ospedali
     icc = PAPER2_SS_PARAMS$icc_values,
     cens = PAPER2_SS_PARAMS$cens_values,
     balancing_mode = PAPER2_SS_PARAMS$balancing_modes,
