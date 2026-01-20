@@ -821,3 +821,100 @@ sample_size_icc_binary <- function(icc, num_hosp, pop_treat_effect,
     cv = cv
   )
 }
+
+
+
+
+
+# Nuova RESEARCH per N hospital design sample size -----------------------------------
+
+sample_hosp_size_binary <- function(icc, 
+                                    n_per_hosp =10, # Numero di pazienti fisso per ospedale
+                                    pop_treat_effect, 
+                                    nsim = 30,
+                                    min_hosp = 4,   
+                                    max_hosp = 500, 
+                                    target_power = 0.8,
+                                    lambda = 0.1, 
+                                    gammas = 1, 
+                                    cens = 2, 
+                                    balancing_mode = 1) {
+  
+
+  estimate_power_hosp <- function(nh) {
+    significant <- logical(nsim)
+    current_total_sample = n_per_hosp * nh
+    
+    for (i in 1:nsim) {
+      cohort <- tryCatch({
+        simulate_survival_cohort_hospital(
+          num_hosp = nh,
+          sample_size = current_total_sample,
+          icc = icc,
+          pop_treat_effect = pop_treat_effect,
+          lambda = lambda,
+          gammas = gammas,
+          cens = cens,
+          balancing_mode = balancing_mode
+        )
+      }, error = function(e) NULL)
+      
+      if (is.null(cohort)) next
+      
+      mod <- tryCatch({
+       coxph(Surv(eventtime, status) ~ treat + cluster(hospital), data = cohort)
+      }, error = function(e) NULL)
+      
+      if (!is.null(mod)) {
+      p_val <- summary(mod)$coefficients["treat", "Pr(>|z|)"]
+        significant[i] <- p_val < 0.05
+      }
+    }
+    return(mean(significant, na.rm = TRUE))
+  }
+  
+  # Binary search sui cluster (ospedali)
+  low <- min_hosp
+  high <- max_hosp
+  result_hosp <- NA
+  result_power <- NA
+  
+ message(sprintf("Verifica iniziale con %d ospedali...", high))
+  power_max <- estimate_power_hosp(high)
+  
+  if (power_max < target_power) {
+    message(sprintf("Target irraggiungibile: power = %.2f con %d ospedali", power_max, high))
+    result_hosp <- Inf
+    result_power <- power_max
+  } else {
+    while (high - low > 1) {
+      mid <- floor((low + high) / 2)
+      power_mid <- estimate_power_hosp(mid)
+      
+      message(sprintf("  Ospedali = %d, power = %.3f", mid, power_mid))
+      
+      if (power_mid >= target_power) {
+        high <- mid
+        result_hosp <- mid
+        result_power <- power_mid
+      } else {
+        low <- mid
+      }
+    }
+    
+    if (is.na(result_hosp)) {
+      result_hosp <- high
+      result_power <- estimate_power_hosp(high)
+    }
+  }
+  
+  return(tibble(
+    nsim = nsim,
+    icc = icc,
+    n_per_hosp = n_per_hosp,
+    target_power = target_power,
+    num_hosp_needed = result_hosp,
+    total_patients = if(is.infinite(result_hosp)) Inf else result_hosp * n_per_hosp,
+    final_power = result_power
+  ))
+}
