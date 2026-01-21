@@ -31,20 +31,20 @@ process_ss_scenario <- function(scenario_id, scen, nsim, max_n,
   
   res <- tryCatch({
     sample_size_icc_binary(
-      icc = scen$icc,
-      num_hosp = scen$num_hosp,
-      pop_treat_effect = scen$pop_treat_effect,
-      nsim = nsim,
-      min_n = 2,
-      max_n = max_n,
-      target_power = 0.8,
-      lambda = scen$lambda,
-      cens = scen$cens,
-      balancing_mode = scen$balancing_mode,
-      simula_fun = simula_fun
+      icc              = as.numeric(scen$icc),
+      num_hosp         = as.integer(scen$num_hosp),
+      pop_treat_effect = as.numeric(scen$pop_treat_effect),
+      nsim             = as.integer(nsim),
+      min_n            = 2,
+      max_n            = as.integer(max_n),
+      target_power     = 0.8,
+      lambda           = as.numeric(scen$lambda),
+      cens             = as.numeric(scen$cens),
+      balancing_mode   = as.integer(scen$balancing_mode),
+      simula_fun       = simula_fun
     )
   }, error = function(e) {
-    message(sprintf("Errore scenario %d: %s", scenario_id, e$message))
+    message(sprintf("!!! Errore critico Scenario %d: %s", scenario_id, e$message))
     NULL
   })
   
@@ -126,7 +126,7 @@ process_ss_scenario_hosp <- function(scenario_id, scen, nsim, max_n,
     return(readRDS(filename))
   }
   
-  message(sprintf(">>> Sample size scenario %d | icc=%.2f, hosp=%d, effect=%.1f",
+  message(sprintf(">>> Sample size scenario %d | icc=%.2f, pazienti=%d, effect=%.1f",
                   scenario_id, scen$icc, scen$num_paz, scen$pop_treat_effect))
   
   res <- tryCatch({
@@ -136,7 +136,7 @@ process_ss_scenario_hosp <- function(scenario_id, scen, nsim, max_n,
       pop_treat_effect = scen$pop_treat_effect,
       nsim = nsim,
       min_hosp = 2,
-      max_hosp = max_n,
+      max_hosp = 2000,
       target_power = 0.8,
       lambda = scen$lambda,
       cens = scen$cens,
@@ -151,6 +151,8 @@ process_ss_scenario_hosp <- function(scenario_id, scen, nsim, max_n,
   if (is.null(res)) {
 res <- tibble(
     nsim = nsim,
+    lambda = scen$lambda,
+    cens =  scen$cens,
     icc = scen$icc,
     pop_treat_effect = scen$pop_treat_effect,
     balancing_mode = scen$balancing_mode,
@@ -180,24 +182,24 @@ run_paper2_ss_hospital <- function() {
   
   cat("\n========== PAPER 2 SAMPLE SIZE - DESIGN HOSPITAL ==========\n")
   
-  scenarios <- make_paper2_ss_scenarios_hosp()
-  cat(sprintf("Scenari: %d\n", nrow(scenarios)))
+  scenarios_hosp <- make_paper2_ss_scenarios_hosp()
+  cat(sprintf("Scenari: %d\n", nrow(scenarios_hosp)))
   cat(sprintf("nsim per step: %d\n", PAPER2_SS_NSIM))
-  cat(sprintf("Max n per gruppo: %d\n", PAPER2_SS_MAX_PAT))
+  cat(sprintf("Max hosp 2000"))
   
   # Directory separata per hospital
-  dir_ss_hosp <- file.path(DIR_BASE, "paper2_sample_size_hospital")
+  dir_ss_hosp <- file.path(DIR_BASE, "paper2_sample_size_hospital_2")
   dir.create(dir_ss_hosp, recursive = TRUE, showWarnings = FALSE)
   
   with_progress({
-    p <- progressor(steps = nrow(scenarios))
+    p <- progressor(steps = nrow(scenarios_hosp))
     
-    results <- future_map(1:nrow(scenarios), function(i) {
+    results <- future_map(1:nrow(scenarios_hosp), function(i) {
       res <- process_ss_scenario_hosp(
         scenario_id = i,
-        scen = scenarios[i, ],
+        scen = scenarios_hosp[i, ],
         nsim = PAPER2_SS_NSIM,
-        max_n = PAPER2_SS_MAX_PAT,
+        max_n = 500,
         dir_out = dir_ss_hosp,
         simula_fun = simulate_survival_cohort_hospital
       )
