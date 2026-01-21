@@ -710,11 +710,11 @@ surv_power_function <- function(simula_coorte_fun, simula_args = list(), nsim = 
 }
 
 
+
 # =============================================================================
 # 4) SAMPLE SIZE FUNCTION (ottimizzata con binary search)
 # =============================================================================
 
-#' Ricerca sample size con binary search (più veloce del +1 iterativo)
 sample_size_icc_binary <- function(icc, num_hosp, pop_treat_effect, 
                                    nsim = 500,
                                    min_n = 2, max_n = 300,
@@ -723,10 +723,10 @@ sample_size_icc_binary <- function(icc, num_hosp, pop_treat_effect,
                                    cens = 2, balancing_mode = 1,
                                    simula_fun = simulate_survival_cohort_individual) {
   
-  # Funzione per stimare power dato n per gruppo
+  # Funzione interna per stimare power e CV medio
   estimate_power <- function(npt) {
     significant <- logical(nsim)
-    cv <- NA_real_  # inizializza cv
+    cv_values <- numeric(nsim) 
     
     for (i in 1:nsim) {
       cohort <- tryCatch({
@@ -742,7 +742,13 @@ sample_size_icc_binary <- function(icc, num_hosp, pop_treat_effect,
         )
       }, error = function(e) NULL)
       
-      if (is.null(cohort)) next
+      if (is.null(cohort)) {
+        cv_values[i] <- NA
+        next
+      }
+      
+      # Estraiamo il CV di questa specifica simulazione
+      cv_values[i] <- unique(cohort$cv)[1]
       
       mod <- tryCatch({
         coxph(Surv(eventtime, status) ~ treat + cluster(hospital), data = cohort)
@@ -752,61 +758,56 @@ sample_size_icc_binary <- function(icc, num_hosp, pop_treat_effect,
         p_val <- summary(mod)$coefficients["treat", "Pr(>|z|)"]
         significant[i] <- p_val < 0.05
       }
-      
-      # Aggiorna cv ad ogni iterazione valida
-      cv <- unique(cohort$cv)
     }
     
-    # Ritorna power e cv dell'ultima cohort valida
-    list(power = mean(significant, na.rm = TRUE), cv = cv)
+    list(
+      power = mean(significant, na.rm = TRUE), 
+      cv_res = mean(cv_values, na.rm = TRUE)
+    )
   }
   
-  # Binary search
   low <- min_n
   high <- max_n
   result_n <- NA
   result_power <- NA
-  cv <- NA_real_   # inizializza cv
+  final_cv <- NA_real_ 
   
-  # Prima verifica se max_n è sufficiente
-  res <- estimate_power(high)
-  power_max <- res$power
-  cv <- res$cv
-  
-  if (power_max < target_power) {
+  # Check iniziale sul valore massimo
+  res_max <- estimate_power(high)
+  if (res_max$power < target_power) {
     message(sprintf("Attenzione: power = %.2f con n = %d < target %.2f", 
-                    power_max, high, target_power))
+                    res_max$power, high, target_power))
     result_n <- high
-    result_power <- power_max
+    result_power <- res_max$power
+    final_cv <- res_max$cv_res
   } else {
     # Binary search
     while (high - low > 1) {
       mid <- floor((low + high) / 2)
       res_mid <- estimate_power(mid)
-      power_mid <- res_mid$power
-      cv <- res_mid$cv   # aggiorna CV ogni volta
       
-      message(sprintf("  n = %d, power = %.3f", mid, power_mid))
+      message(sprintf("  n = %d, power = %.3f, CV medio = %.3f", 
+                      mid, res_mid$power, res_mid$cv_res))
       
-      if (power_mid >= target_power) {
+      if (res_mid$power >= target_power) {
         high <- mid
         result_n <- mid
-        result_power <- power_mid
+        result_power <- res_mid$power
+        final_cv <- res_mid$cv_res 
       } else {
         low <- mid
       }
     }
     
-    # Affina con ultimo check
     if (is.na(result_n)) {
       res_last <- estimate_power(high)
       result_n <- high
       result_power <- res_last$power
-      cv <- res_last$cv
+      final_cv <- res_last$cv_res
     }
   }
   
-  # Costruzione tibble finale
+  # Output finale con colonna chiamata 'cv'
   tibble(
     nsim = nsim,
     icc = icc,
@@ -818,33 +819,54 @@ sample_size_icc_binary <- function(icc, num_hosp, pop_treat_effect,
     num_pat_group = result_n,
     sample_size = result_n * num_hosp,
     power = result_power,
-    cv = cv
+    cv = final_cv
   )
 }
 
+# risultato_ind <- sample_size_icc_binary(
+#   icc = 0.05,
+#   num_hosp = 20,           # Fisso il numero di pazienti per centro
+#   pop_treat_effect = -0.5,
+#   nsim = 20,
+#   min_n = 10,
+#   max_n = 300,
+#   target_power = 0.8,
+#   lambda = 0.115,
+#   cens = 0.5,
+#   balancing_mode = 2)
+# 
+# print(risultato_ind)
 
 
+sample_size_icc_binary <- function(icc, num_hosp, pop_treat_effect, 
+                                   nsim = 500,
+                                   min_n = 2, max_n = 300,
+                                   target_power = 0.8,
+                                   lambda = 0.1, gammas = 1, 
+                                   cens = 2, balancing_mode = 1,
+                                   simula_fun = simulate_survival_cohort_individual)
 
-
-# Nuova RESEARCH per N hospital design sample size -----------------------------------
+# =============================================================================
+# RESEARCH per N hospital design sample size 
+# =============================================================================
 
 sample_hosp_size_binary <- function(icc, 
-                                    n_per_hosp = 10, # Numero di pazienti fisso per ospedale
+                                    n_per_hosp = 10, 
                                     pop_treat_effect, 
                                     nsim = 30,
-                                    min_hosp = 4,   
+                                    min_hosp = 5,   
                                     max_hosp = 500, 
                                     target_power = 0.8,
                                     lambda = 0.1, 
                                     gammas = 1, 
                                     cens = 2, 
-                                    balancing_mode = 1) {
+                                    balancing_mode = 1,
+                                    simula_fun = simulate_survival_cohort_hospital) {
   
-  # Variabile per memorizzare il cv trovato durante le simulazioni
-  cv_val <- NA_real_ 
-  
+  # Funzione interna per stimare power e CV medio dato il numero di ospedali (nh)
   estimate_power_hosp <- function(nh) {
     significant <- logical(nsim)
+    cv_vector <- numeric(nsim)
     current_total_sample = n_per_hosp * nh
     
     for (i in 1:nsim) {
@@ -861,10 +883,14 @@ sample_hosp_size_binary <- function(icc,
         )
       }, error = function(e) NULL)
       
-      if (is.null(cohort)) next
+      if (is.null(cohort)) {
+        significant[i] <- NA
+        cv_vector[i] <- NA
+        next
+      }
       
-      # Estrazione del CV dalla coorte corrente
-      cv_val <<- unique(cohort$cv) 
+      # Salviamo il CV di questa simulazione
+      cv_vector[i] <- unique(cohort$cv) 
       
       mod <- tryCatch({
         coxph(Surv(eventtime, status) ~ treat + cluster(hospital), data = cohort)
@@ -873,19 +899,29 @@ sample_hosp_size_binary <- function(icc,
       if (!is.null(mod)) {
         p_val <- summary(mod)$coefficients["treat", "Pr(>|z|)"]
         significant[i] <- p_val < 0.05
+      } else {
+        significant[i] <- NA
       }
     }
-    return(mean(significant, na.rm = TRUE))
+    
+    # Ritorna la media dei risultati validi
+    list(
+      power = mean(significant, na.rm = TRUE), 
+      cv = mean(cv_vector, na.rm = TRUE)
+    )
   }
   
-  # Binary search sui cluster (ospedali)
+  # Logica di Binary Search
   low <- min_hosp
   high <- max_hosp
   result_hosp <- NA
   result_power <- NA
+  current_cv <- NA_real_
   
   message(sprintf("Verifica iniziale con %d ospedali...", high))
-  power_max <- estimate_power_hosp(high)
+  res_max <- estimate_power_hosp(high)
+  power_max <- res_max$power
+  current_cv <- res_max$cv
   
   if (power_max < target_power) {
     message(sprintf("Target irraggiungibile: power = %.2f con %d ospedali", power_max, high))
@@ -894,7 +930,10 @@ sample_hosp_size_binary <- function(icc,
   } else {
     while (high - low > 1) {
       mid <- floor((low + high) / 2)
-      power_mid <- estimate_power_hosp(mid)
+      res_mid <- estimate_power_hosp(mid)
+      
+      power_mid <- res_mid$power
+      current_cv <- res_mid$cv  # Aggiorna il CV medio dello step corrente
       
       message(sprintf("  Ospedali = %d, power = %.3f", mid, power_mid))
       
@@ -908,20 +947,39 @@ sample_hosp_size_binary <- function(icc,
     }
     
     if (is.na(result_hosp)) {
+      res_final <- estimate_power_hosp(high)
       result_hosp <- high
-      result_power <- estimate_power_hosp(high)
+      result_power <- res_final$power
+      current_cv <- res_final$cv
     }
   }
   
   return(tibble(
     nsim = nsim,
     icc = icc,
+    lambda = lambda,
+    cens = cens,
     pop_treat_effect = pop_treat_effect,
     balancing_mode = balancing_mode,
     num_pat_group = n_per_hosp,
     num_hosp = result_hosp,
     sample_size = if(is.infinite(result_hosp)) Inf else result_hosp * n_per_hosp,
     power = result_power,
-    cv = cv_val  # Aggiunto qui alla fine
+    cv = current_cv
   ))
 }
+
+# 
+# risultato_hosp <- sample_hosp_size_binary(
+#   icc = 0.05,
+#   n_per_hosp = 20,           # Fisso il numero di pazienti per centro
+#   pop_treat_effect = -0.5,
+#   nsim = 20,
+#   min_hosp = 10,
+#   max_hosp = 300,
+#   target_power = 0.8,
+#   lambda = 0.115,
+#   cens = 0.5,
+#   balancing_mode = 2)
+# 
+# print(risultato_hosp)
