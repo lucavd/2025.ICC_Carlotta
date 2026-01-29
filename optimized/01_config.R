@@ -19,8 +19,8 @@ library(parfm)
 
 # --- Parallelizzazione ---
 # Imposta il numero di core. Su server HPC, usa tutti quelli disponibili.
-N_CORES <- parallel::detectCores() - 1
-# N_CORES <- 110
+# N_CORES <- parallel::detectCores() - 1
+N_CORES <- 110
 
 # Inizializza il piano future (da chiamare PRIMA di ogni script)
 setup_parallel <- function(n_workers = N_CORES) {

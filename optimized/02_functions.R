@@ -838,14 +838,6 @@ sample_size_icc_binary <- function(icc, num_hosp, pop_treat_effect,
 # print(risultato_ind)
 
 
-sample_size_icc_binary <- function(icc, num_hosp, pop_treat_effect, 
-                                   nsim = 500,
-                                   min_n = 2, max_n = 300,
-                                   target_power = 0.8,
-                                   lambda = 0.1, gammas = 1, 
-                                   cens = 2, balancing_mode = 1,
-                                   simula_fun = simulate_survival_cohort_individual)
-
 # =============================================================================
 # RESEARCH per N hospital design sample size 
 # =============================================================================

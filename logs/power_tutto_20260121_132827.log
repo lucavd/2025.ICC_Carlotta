@@ -1,0 +1,729 @@
+nohup: ignoring input
+── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+✔ dplyr     1.1.4     ✔ readr     2.1.6
+✔ forcats   1.0.1     ✔ stringr   1.6.0
+✔ ggplot2   4.0.1     ✔ tibble    3.3.0
+✔ lubridate 1.9.4     ✔ tidyr     1.3.1
+✔ purrr     1.2.0     
+── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+✖ dplyr::filter() masks stats::filter()
+✖ dplyr::lag()    masks stats::lag()
+ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
+Loading required package: future
+
+Attaching package: ‘survival’
+
+The following object is masked from ‘package:future’:
+
+    cluster
+
+Loading required package: Matrix
+
+Attaching package: ‘Matrix’
+
+The following objects are masked from ‘package:tidyr’:
+
+    expand, pack, unpack
+
+Loading required package: bdsmatrix
+
+Attaching package: ‘bdsmatrix’
+
+The following object is masked from ‘package:base’:
+
+    backsolve
+
+Loading required package: boot
+
+Attaching package: ‘boot’
+
+The following object is masked from ‘package:survival’:
+
+    aml
+
+Loading required package: doBy
+Registered S3 method overwritten by 'quantmod':
+  method            from
+  as.zoo.data.frame zoo 
+
+Attaching package: ‘doBy’
+
+The following object is masked from ‘package:dplyr’:
+
+    order_by
+
+Loading required package: MASS
+
+Attaching package: ‘MASS’
+
+The following object is masked from ‘package:doBy’:
+
+    shoes
+
+The following object is masked from ‘package:dplyr’:
+
+    select
+
+Loading required package: survC1
+
+Attaching package: ‘frailtypack’
+
+The following object is masked from ‘package:survival’:
+
+    cluster
+
+The following object is masked from ‘package:future’:
+
+    cluster
+
+Loading required package: optimx
+Piano parallelo attivato: 110 workers
+
+========== PAPER 2 POWER - DESIGN INDIVIDUAL ==========
+Scenari base: 960
+nsim per scenario: 1000
+
+--- Step 1: Calcolo power base ---
+>>> Power scenario 573 | icc=0.10, n=500, hosp=30, effect=-0.2
+>>> Power scenario 822 | icc=0.00, n=500, hosp=60, effect=-0.5
+
+--- Step 2: Calcolo power con sample size DE ---
+Scenari DE da processare: 768
+>>> Scenario DE 129 SKIPPED: sample_size_DE=41901 > cap=20000 (non realistico)
+>>> Scenario DE 130 SKIPPED: sample_size_DE=41901 > cap=20000 (non realistico)
+>>> Scenario DE 131 SKIPPED: sample_size_DE=41901 > cap=20000 (non realistico)
+>>> Scenario DE 132 SKIPPED: sample_size_DE=41901 > cap=20000 (non realistico)
+>>> Scenario DE 133 SKIPPED: sample_size_DE=81801 > cap=20000 (non realistico)
+>>> Scenario DE 134 SKIPPED: sample_size_DE=81801 > cap=20000 (non realistico)
+>>> Scenario DE 135 SKIPPED: sample_size_DE=81801 > cap=20000 (non realistico)
+>>> Scenario DE 136 SKIPPED: sample_size_DE=81801 > cap=20000 (non realistico)
+>>> Scenario DE 137 SKIPPED: sample_size_DE=241400 > cap=20000 (non realistico)
+>>> Scenario DE 138 SKIPPED: sample_size_DE=241400 > cap=20000 (non realistico)
+>>> Scenario DE 139 SKIPPED: sample_size_DE=241400 > cap=20000 (non realistico)
+>>> Scenario DE 140 SKIPPED: sample_size_DE=241400 > cap=20000 (non realistico)
+>>> Scenario DE 153 SKIPPED: sample_size_DE=28467 > cap=20000 (non realistico)
+>>> Scenario DE 154 SKIPPED: sample_size_DE=28467 > cap=20000 (non realistico)
+>>> Scenario DE 155 SKIPPED: sample_size_DE=28467 > cap=20000 (non realistico)
+>>> Scenario DE 156 SKIPPED: sample_size_DE=28467 > cap=20000 (non realistico)
+>>> Scenario DE 157 SKIPPED: sample_size_DE=81400 > cap=20000 (non realistico)
+>>> Scenario DE 158 SKIPPED: sample_size_DE=81400 > cap=20000 (non realistico)
+>>> Scenario DE 159 SKIPPED: sample_size_DE=81400 > cap=20000 (non realistico)
+>>> Scenario DE 160 SKIPPED: sample_size_DE=81400 > cap=20000 (non realistico)
+>>> Scenario DE 177 SKIPPED: sample_size_DE=21401 > cap=20000 (non realistico)
+>>> Scenario DE 178 SKIPPED: sample_size_DE=21401 > cap=20000 (non realistico)
+>>> Scenario DE 179 SKIPPED: sample_size_DE=21401 > cap=20000 (non realistico)
+>>> Scenario DE 180 SKIPPED: sample_size_DE=21401 > cap=20000 (non realistico)
+>>> Scenario DE 185 SKIPPED: sample_size_DE=77940 > cap=20000 (non realistico)
+>>> Scenario DE 186 SKIPPED: sample_size_DE=77940 > cap=20000 (non realistico)
+>>> Scenario DE 187 SKIPPED: sample_size_DE=77940 > cap=20000 (non realistico)
+>>> Scenario DE 188 SKIPPED: sample_size_DE=77940 > cap=20000 (non realistico)
+>>> Scenario DE 189 SKIPPED: sample_size_DE=365700 > cap=20000 (non realistico)
+>>> Scenario DE 190 SKIPPED: sample_size_DE=365700 > cap=20000 (non realistico)
+>>> Scenario DE 191 SKIPPED: sample_size_DE=365700 > cap=20000 (non realistico)
+>>> Scenario DE 192 SKIPPED: sample_size_DE=365700 > cap=20000 (non realistico)
+>>> Scenario DE 193 SKIPPED: sample_size_DE=725400 > cap=20000 (non realistico)
+>>> Scenario DE 194 SKIPPED: sample_size_DE=725400 > cap=20000 (non realistico)
+>>> Scenario DE 195 SKIPPED: sample_size_DE=725400 > cap=20000 (non realistico)
+>>> Scenario DE 196 SKIPPED: sample_size_DE=725400 > cap=20000 (non realistico)
+>>> Scenario DE 197 SKIPPED: sample_size_DE=2164200 > cap=20000 (non realistico)
+>>> Scenario DE 198 SKIPPED: sample_size_DE=2164200 > cap=20000 (non realistico)
+>>> Scenario DE 199 SKIPPED: sample_size_DE=2164200 > cap=20000 (non realistico)
+>>> Scenario DE 200 SKIPPED: sample_size_DE=2164200 > cap=20000 (non realistico)
+>>> Scenario DE 205 SKIPPED: sample_size_DE=29940 > cap=20000 (non realistico)
+>>> Scenario DE 206 SKIPPED: sample_size_DE=29940 > cap=20000 (non realistico)
+>>> Scenario DE 207 SKIPPED: sample_size_DE=29940 > cap=20000 (non realistico)
+>>> Scenario DE 208 SKIPPED: sample_size_DE=29940 > cap=20000 (non realistico)
+>>> Scenario DE 209 SKIPPED: sample_size_DE=125701 > cap=20000 (non realistico)
+>>> Scenario DE 210 SKIPPED: sample_size_DE=125701 > cap=20000 (non realistico)
+>>> Scenario DE 211 SKIPPED: sample_size_DE=125701 > cap=20000 (non realistico)
+>>> Scenario DE 212 SKIPPED: sample_size_DE=125701 > cap=20000 (non realistico)
+>>> Scenario DE 213 SKIPPED: sample_size_DE=245401 > cap=20000 (non realistico)
+>>> Scenario DE 214 SKIPPED: sample_size_DE=245401 > cap=20000 (non realistico)
+>>> Scenario DE 215 SKIPPED: sample_size_DE=245401 > cap=20000 (non realistico)
+>>> Scenario DE 216 SKIPPED: sample_size_DE=245401 > cap=20000 (non realistico)
+>>> Scenario DE 217 SKIPPED: sample_size_DE=724200 > cap=20000 (non realistico)
+>>> Scenario DE 218 SKIPPED: sample_size_DE=724200 > cap=20000 (non realistico)
+>>> Scenario DE 219 SKIPPED: sample_size_DE=724200 > cap=20000 (non realistico)
+>>> Scenario DE 220 SKIPPED: sample_size_DE=724200 > cap=20000 (non realistico)
+>>> Scenario DE 229 SKIPPED: sample_size_DE=35700 > cap=20000 (non realistico)
+>>> Scenario DE 230 SKIPPED: sample_size_DE=35700 > cap=20000 (non realistico)
+>>> Scenario DE 231 SKIPPED: sample_size_DE=35700 > cap=20000 (non realistico)
+>>> Scenario DE 232 SKIPPED: sample_size_DE=35700 > cap=20000 (non realistico)
+>>> Scenario DE 233 SKIPPED: sample_size_DE=65400 > cap=20000 (non realistico)
+>>> Scenario DE 234 SKIPPED: sample_size_DE=65400 > cap=20000 (non realistico)
+>>> Scenario DE 235 SKIPPED: sample_size_DE=65400 > cap=20000 (non realistico)
+>>> Scenario DE 236 SKIPPED: sample_size_DE=65400 > cap=20000 (non realistico)
+>>> Scenario DE 237 SKIPPED: sample_size_DE=184200 > cap=20000 (non realistico)
+>>> Scenario DE 238 SKIPPED: sample_size_DE=184200 > cap=20000 (non realistico)
+>>> Scenario DE 239 SKIPPED: sample_size_DE=184200 > cap=20000 (non realistico)
+>>> Scenario DE 240 SKIPPED: sample_size_DE=184200 > cap=20000 (non realistico)
+>>> Scenario DE 369 SKIPPED: sample_size_DE=41901 > cap=20000 (non realistico)
+>>> Scenario DE 370 SKIPPED: sample_size_DE=41901 > cap=20000 (non realistico)
+>>> Scenario DE 371 SKIPPED: sample_size_DE=41901 > cap=20000 (non realistico)
+>>> Scenario DE 372 SKIPPED: sample_size_DE=41901 > cap=20000 (non realistico)
+>>> Scenario DE 373 SKIPPED: sample_size_DE=81801 > cap=20000 (non realistico)
+>>> Scenario DE 374 SKIPPED: sample_size_DE=81801 > cap=20000 (non realistico)
+>>> Scenario DE 375 SKIPPED: sample_size_DE=81801 > cap=20000 (non realistico)
+>>> Scenario DE 376 SKIPPED: sample_size_DE=81801 > cap=20000 (non realistico)
+>>> Scenario DE 377 SKIPPED: sample_size_DE=241400 > cap=20000 (non realistico)
+>>> Scenario DE 378 SKIPPED: sample_size_DE=241400 > cap=20000 (non realistico)
+>>> Scenario DE 379 SKIPPED: sample_size_DE=241400 > cap=20000 (non realistico)
+>>> Scenario DE 380 SKIPPED: sample_size_DE=241400 > cap=20000 (non realistico)
+>>> Scenario DE 393 SKIPPED: sample_size_DE=28467 > cap=20000 (non realistico)
+>>> Scenario DE 394 SKIPPED: sample_size_DE=28467 > cap=20000 (non realistico)
+>>> Scenario DE 395 SKIPPED: sample_size_DE=28467 > cap=20000 (non realistico)
+>>> Scenario DE 396 SKIPPED: sample_size_DE=28467 > cap=20000 (non realistico)
+>>> Scenario DE 397 SKIPPED: sample_size_DE=81400 > cap=20000 (non realistico)
+>>> Scenario DE 398 SKIPPED: sample_size_DE=81400 > cap=20000 (non realistico)
+>>> Scenario DE 399 SKIPPED: sample_size_DE=81400 > cap=20000 (non realistico)
+>>> Scenario DE 400 SKIPPED: sample_size_DE=81400 > cap=20000 (non realistico)
+>>> Scenario DE 417 SKIPPED: sample_size_DE=21401 > cap=20000 (non realistico)
+>>> Scenario DE 418 SKIPPED: sample_size_DE=21401 > cap=20000 (non realistico)
+>>> Scenario DE 419 SKIPPED: sample_size_DE=21401 > cap=20000 (non realistico)
+>>> Scenario DE 420 SKIPPED: sample_size_DE=21401 > cap=20000 (non realistico)
+>>> Scenario DE 425 SKIPPED: sample_size_DE=77940 > cap=20000 (non realistico)
+>>> Scenario DE 426 SKIPPED: sample_size_DE=77940 > cap=20000 (non realistico)
+>>> Scenario DE 427 SKIPPED: sample_size_DE=77940 > cap=20000 (non realistico)
+>>> Scenario DE 428 SKIPPED: sample_size_DE=77940 > cap=20000 (non realistico)
+>>> Scenario DE 429 SKIPPED: sample_size_DE=365700 > cap=20000 (non realistico)
+>>> Scenario DE 430 SKIPPED: sample_size_DE=365700 > cap=20000 (non realistico)
+>>> Scenario DE 431 SKIPPED: sample_size_DE=365700 > cap=20000 (non realistico)
+>>> Scenario DE 432 SKIPPED: sample_size_DE=365700 > cap=20000 (non realistico)
+>>> Scenario DE 433 SKIPPED: sample_size_DE=725400 > cap=20000 (non realistico)
+>>> Scenario DE 434 SKIPPED: sample_size_DE=725400 > cap=20000 (non realistico)
+>>> Scenario DE 435 SKIPPED: sample_size_DE=725400 > cap=20000 (non realistico)
+>>> Scenario DE 436 SKIPPED: sample_size_DE=725400 > cap=20000 (non realistico)
+>>> Scenario DE 437 SKIPPED: sample_size_DE=2164200 > cap=20000 (non realistico)
+>>> Scenario DE 438 SKIPPED: sample_size_DE=2164200 > cap=20000 (non realistico)
+>>> Scenario DE 439 SKIPPED: sample_size_DE=2164200 > cap=20000 (non realistico)
+>>> Scenario DE 440 SKIPPED: sample_size_DE=2164200 > cap=20000 (non realistico)
+>>> Scenario DE 445 SKIPPED: sample_size_DE=29940 > cap=20000 (non realistico)
+>>> Scenario DE 446 SKIPPED: sample_size_DE=29940 > cap=20000 (non realistico)
+>>> Scenario DE 447 SKIPPED: sample_size_DE=29940 > cap=20000 (non realistico)
+>>> Scenario DE 448 SKIPPED: sample_size_DE=29940 > cap=20000 (non realistico)
+>>> Scenario DE 449 SKIPPED: sample_size_DE=125701 > cap=20000 (non realistico)
+>>> Scenario DE 450 SKIPPED: sample_size_DE=125701 > cap=20000 (non realistico)
+>>> Scenario DE 451 SKIPPED: sample_size_DE=125701 > cap=20000 (non realistico)
+>>> Scenario DE 452 SKIPPED: sample_size_DE=125701 > cap=20000 (non realistico)
+>>> Scenario DE 453 SKIPPED: sample_size_DE=245401 > cap=20000 (non realistico)
+>>> Scenario DE 454 SKIPPED: sample_size_DE=245401 > cap=20000 (non realistico)
+>>> Scenario DE 455 SKIPPED: sample_size_DE=245401 > cap=20000 (non realistico)
+>>> Scenario DE 456 SKIPPED: sample_size_DE=245401 > cap=20000 (non realistico)
+>>> Scenario DE 457 SKIPPED: sample_size_DE=724200 > cap=20000 (non realistico)
+>>> Scenario DE 458 SKIPPED: sample_size_DE=724200 > cap=20000 (non realistico)
+>>> Scenario DE 459 SKIPPED: sample_size_DE=724200 > cap=20000 (non realistico)
+>>> Scenario DE 460 SKIPPED: sample_size_DE=724200 > cap=20000 (non realistico)
+>>> Scenario DE 469 SKIPPED: sample_size_DE=35700 > cap=20000 (non realistico)
+>>> Scenario DE 470 SKIPPED: sample_size_DE=35700 > cap=20000 (non realistico)
+>>> Scenario DE 471 SKIPPED: sample_size_DE=35700 > cap=20000 (non realistico)
+>>> Scenario DE 472 SKIPPED: sample_size_DE=35700 > cap=20000 (non realistico)
+>>> Scenario DE 473 SKIPPED: sample_size_DE=65400 > cap=20000 (non realistico)
+>>> Scenario DE 474 SKIPPED: sample_size_DE=65400 > cap=20000 (non realistico)
+>>> Scenario DE 475 SKIPPED: sample_size_DE=65400 > cap=20000 (non realistico)
+>>> Scenario DE 476 SKIPPED: sample_size_DE=65400 > cap=20000 (non realistico)
+>>> Scenario DE 477 SKIPPED: sample_size_DE=184200 > cap=20000 (non realistico)
+>>> Scenario DE 478 SKIPPED: sample_size_DE=184200 > cap=20000 (non realistico)
+>>> Scenario DE 479 SKIPPED: sample_size_DE=184200 > cap=20000 (non realistico)
+>>> Scenario DE 480 SKIPPED: sample_size_DE=184200 > cap=20000 (non realistico)
+>>> Power DE scenario 525 | icc=0.01, n_DE=101
+>>> Power DE scenario 526 | icc=0.01, n_DE=101
+>>> Power DE scenario 527 | icc=0.01, n_DE=101
+>>> Power DE scenario 528 | icc=0.01, n_DE=101
+>>> Power DE scenario 529 | icc=0.05, n_DE=104
+>>> Power DE scenario 530 | icc=0.05, n_DE=104
+>>> Power DE scenario 531 | icc=0.05, n_DE=104
+>>> Power DE scenario 532 | icc=0.05, n_DE=104
+>>> Power DE scenario 533 | icc=0.10, n_DE=107
+>>> Power DE scenario 534 | icc=0.10, n_DE=107
+>>> Power DE scenario 535 | icc=0.10, n_DE=107
+>>> Power DE scenario 536 | icc=0.10, n_DE=107
+>>> Power DE scenario 537 | icc=0.30, n_DE=120
+>>> Power DE scenario 538 | icc=0.30, n_DE=120
+>>> Power DE scenario 539 | icc=0.30, n_DE=120
+>>> Power DE scenario 540 | icc=0.30, n_DE=120
+>>> Power DE scenario 573 | icc=0.10, n_DE=1284
+>>> Power DE scenario 586 | icc=0.01, n_DE=537
+>>> Scenario DE 609 SKIPPED: sample_size_DE=41901 > cap=20000 (non realistico)
+>>> Scenario DE 610 SKIPPED: sample_size_DE=41901 > cap=20000 (non realistico)
+>>> Scenario DE 611 SKIPPED: sample_size_DE=41901 > cap=20000 (non realistico)
+>>> Scenario DE 612 SKIPPED: sample_size_DE=41901 > cap=20000 (non realistico)
+>>> Scenario DE 613 SKIPPED: sample_size_DE=81801 > cap=20000 (non realistico)
+>>> Scenario DE 614 SKIPPED: sample_size_DE=81801 > cap=20000 (non realistico)
+>>> Scenario DE 615 SKIPPED: sample_size_DE=81801 > cap=20000 (non realistico)
+>>> Scenario DE 616 SKIPPED: sample_size_DE=81801 > cap=20000 (non realistico)
+>>> Scenario DE 617 SKIPPED: sample_size_DE=241400 > cap=20000 (non realistico)
+>>> Scenario DE 618 SKIPPED: sample_size_DE=241400 > cap=20000 (non realistico)
+>>> Scenario DE 619 SKIPPED: sample_size_DE=241400 > cap=20000 (non realistico)
+>>> Scenario DE 620 SKIPPED: sample_size_DE=241400 > cap=20000 (non realistico)
+>>> Scenario DE 633 SKIPPED: sample_size_DE=28467 > cap=20000 (non realistico)
+>>> Scenario DE 634 SKIPPED: sample_size_DE=28467 > cap=20000 (non realistico)
+>>> Scenario DE 635 SKIPPED: sample_size_DE=28467 > cap=20000 (non realistico)
+>>> Scenario DE 636 SKIPPED: sample_size_DE=28467 > cap=20000 (non realistico)
+>>> Scenario DE 637 SKIPPED: sample_size_DE=81400 > cap=20000 (non realistico)
+>>> Scenario DE 638 SKIPPED: sample_size_DE=81400 > cap=20000 (non realistico)
+>>> Scenario DE 639 SKIPPED: sample_size_DE=81400 > cap=20000 (non realistico)
+>>> Scenario DE 640 SKIPPED: sample_size_DE=81400 > cap=20000 (non realistico)
+>>> Scenario DE 657 SKIPPED: sample_size_DE=21401 > cap=20000 (non realistico)
+>>> Scenario DE 658 SKIPPED: sample_size_DE=21401 > cap=20000 (non realistico)
+>>> Scenario DE 659 SKIPPED: sample_size_DE=21401 > cap=20000 (non realistico)
+>>> Scenario DE 660 SKIPPED: sample_size_DE=21401 > cap=20000 (non realistico)
+>>> Scenario DE 665 SKIPPED: sample_size_DE=77940 > cap=20000 (non realistico)
+>>> Scenario DE 666 SKIPPED: sample_size_DE=77940 > cap=20000 (non realistico)
+>>> Scenario DE 667 SKIPPED: sample_size_DE=77940 > cap=20000 (non realistico)
+>>> Scenario DE 668 SKIPPED: sample_size_DE=77940 > cap=20000 (non realistico)
+>>> Scenario DE 669 SKIPPED: sample_size_DE=365700 > cap=20000 (non realistico)
+>>> Scenario DE 670 SKIPPED: sample_size_DE=365700 > cap=20000 (non realistico)
+>>> Scenario DE 671 SKIPPED: sample_size_DE=365700 > cap=20000 (non realistico)
+>>> Scenario DE 672 SKIPPED: sample_size_DE=365700 > cap=20000 (non realistico)
+>>> Scenario DE 673 SKIPPED: sample_size_DE=725400 > cap=20000 (non realistico)
+>>> Scenario DE 674 SKIPPED: sample_size_DE=725400 > cap=20000 (non realistico)
+>>> Scenario DE 675 SKIPPED: sample_size_DE=725400 > cap=20000 (non realistico)
+>>> Scenario DE 676 SKIPPED: sample_size_DE=725400 > cap=20000 (non realistico)
+>>> Scenario DE 677 SKIPPED: sample_size_DE=2164200 > cap=20000 (non realistico)
+>>> Scenario DE 678 SKIPPED: sample_size_DE=2164200 > cap=20000 (non realistico)
+>>> Scenario DE 679 SKIPPED: sample_size_DE=2164200 > cap=20000 (non realistico)
+>>> Scenario DE 680 SKIPPED: sample_size_DE=2164200 > cap=20000 (non realistico)
+>>> Scenario DE 685 SKIPPED: sample_size_DE=29940 > cap=20000 (non realistico)
+>>> Scenario DE 686 SKIPPED: sample_size_DE=29940 > cap=20000 (non realistico)
+>>> Scenario DE 687 SKIPPED: sample_size_DE=29940 > cap=20000 (non realistico)
+>>> Scenario DE 688 SKIPPED: sample_size_DE=29940 > cap=20000 (non realistico)
+>>> Scenario DE 689 SKIPPED: sample_size_DE=125701 > cap=20000 (non realistico)
+>>> Scenario DE 690 SKIPPED: sample_size_DE=125701 > cap=20000 (non realistico)
+>>> Scenario DE 691 SKIPPED: sample_size_DE=125701 > cap=20000 (non realistico)
+>>> Scenario DE 692 SKIPPED: sample_size_DE=125701 > cap=20000 (non realistico)
+>>> Scenario DE 693 SKIPPED: sample_size_DE=245401 > cap=20000 (non realistico)
+>>> Scenario DE 694 SKIPPED: sample_size_DE=245401 > cap=20000 (non realistico)
+>>> Scenario DE 695 SKIPPED: sample_size_DE=245401 > cap=20000 (non realistico)
+>>> Scenario DE 696 SKIPPED: sample_size_DE=245401 > cap=20000 (non realistico)
+>>> Scenario DE 697 SKIPPED: sample_size_DE=724200 > cap=20000 (non realistico)
+>>> Scenario DE 698 SKIPPED: sample_size_DE=724200 > cap=20000 (non realistico)
+>>> Scenario DE 699 SKIPPED: sample_size_DE=724200 > cap=20000 (non realistico)
+>>> Scenario DE 700 SKIPPED: sample_size_DE=724200 > cap=20000 (non realistico)
+>>> Scenario DE 709 SKIPPED: sample_size_DE=35700 > cap=20000 (non realistico)
+>>> Scenario DE 710 SKIPPED: sample_size_DE=35700 > cap=20000 (non realistico)
+>>> Scenario DE 711 SKIPPED: sample_size_DE=35700 > cap=20000 (non realistico)
+>>> Scenario DE 712 SKIPPED: sample_size_DE=35700 > cap=20000 (non realistico)
+>>> Scenario DE 713 SKIPPED: sample_size_DE=65400 > cap=20000 (non realistico)
+>>> Scenario DE 714 SKIPPED: sample_size_DE=65400 > cap=20000 (non realistico)
+>>> Scenario DE 715 SKIPPED: sample_size_DE=65400 > cap=20000 (non realistico)
+>>> Scenario DE 716 SKIPPED: sample_size_DE=65400 > cap=20000 (non realistico)
+>>> Scenario DE 717 SKIPPED: sample_size_DE=184200 > cap=20000 (non realistico)
+>>> Scenario DE 718 SKIPPED: sample_size_DE=184200 > cap=20000 (non realistico)
+>>> Scenario DE 719 SKIPPED: sample_size_DE=184200 > cap=20000 (non realistico)
+>>> Scenario DE 720 SKIPPED: sample_size_DE=184200 > cap=20000 (non realistico)
+>>> Power DE scenario 765 | icc=0.01, n_DE=101
+>>> Power DE scenario 766 | icc=0.01, n_DE=101
+>>> Power DE scenario 767 | icc=0.01, n_DE=101
+>>> Power DE scenario 768 | icc=0.01, n_DE=101
+>>> Power DE scenario 769 | icc=0.05, n_DE=104
+>>> Power DE scenario 770 | icc=0.05, n_DE=104
+>>> Power DE scenario 771 | icc=0.05, n_DE=104
+>>> Power DE scenario 772 | icc=0.05, n_DE=104
+>>> Power DE scenario 773 | icc=0.10, n_DE=107
+>>> Power DE scenario 774 | icc=0.10, n_DE=107
+>>> Power DE scenario 775 | icc=0.10, n_DE=107
+>>> Power DE scenario 776 | icc=0.10, n_DE=107
+>>> Power DE scenario 777 | icc=0.30, n_DE=120
+>>> Power DE scenario 778 | icc=0.30, n_DE=120
+>>> Power DE scenario 779 | icc=0.30, n_DE=120
+>>> Power DE scenario 780 | icc=0.30, n_DE=120
+>>> Scenario DE 849 SKIPPED: sample_size_DE=41901 > cap=20000 (non realistico)
+>>> Scenario DE 850 SKIPPED: sample_size_DE=41901 > cap=20000 (non realistico)
+>>> Scenario DE 851 SKIPPED: sample_size_DE=41901 > cap=20000 (non realistico)
+>>> Scenario DE 852 SKIPPED: sample_size_DE=41901 > cap=20000 (non realistico)
+>>> Scenario DE 853 SKIPPED: sample_size_DE=81801 > cap=20000 (non realistico)
+>>> Scenario DE 854 SKIPPED: sample_size_DE=81801 > cap=20000 (non realistico)
+>>> Scenario DE 855 SKIPPED: sample_size_DE=81801 > cap=20000 (non realistico)
+>>> Scenario DE 856 SKIPPED: sample_size_DE=81801 > cap=20000 (non realistico)
+>>> Scenario DE 857 SKIPPED: sample_size_DE=241400 > cap=20000 (non realistico)
+>>> Scenario DE 858 SKIPPED: sample_size_DE=241400 > cap=20000 (non realistico)
+>>> Scenario DE 859 SKIPPED: sample_size_DE=241400 > cap=20000 (non realistico)
+>>> Scenario DE 860 SKIPPED: sample_size_DE=241400 > cap=20000 (non realistico)
+>>> Scenario DE 873 SKIPPED: sample_size_DE=28467 > cap=20000 (non realistico)
+>>> Scenario DE 874 SKIPPED: sample_size_DE=28467 > cap=20000 (non realistico)
+>>> Scenario DE 875 SKIPPED: sample_size_DE=28467 > cap=20000 (non realistico)
+>>> Scenario DE 876 SKIPPED: sample_size_DE=28467 > cap=20000 (non realistico)
+>>> Scenario DE 877 SKIPPED: sample_size_DE=81400 > cap=20000 (non realistico)
+>>> Scenario DE 878 SKIPPED: sample_size_DE=81400 > cap=20000 (non realistico)
+>>> Scenario DE 879 SKIPPED: sample_size_DE=81400 > cap=20000 (non realistico)
+>>> Scenario DE 880 SKIPPED: sample_size_DE=81400 > cap=20000 (non realistico)
+>>> Scenario DE 897 SKIPPED: sample_size_DE=21401 > cap=20000 (non realistico)
+>>> Scenario DE 898 SKIPPED: sample_size_DE=21401 > cap=20000 (non realistico)
+>>> Scenario DE 899 SKIPPED: sample_size_DE=21401 > cap=20000 (non realistico)
+>>> Scenario DE 900 SKIPPED: sample_size_DE=21401 > cap=20000 (non realistico)
+>>> Scenario DE 905 SKIPPED: sample_size_DE=77940 > cap=20000 (non realistico)
+>>> Scenario DE 906 SKIPPED: sample_size_DE=77940 > cap=20000 (non realistico)
+>>> Scenario DE 907 SKIPPED: sample_size_DE=77940 > cap=20000 (non realistico)
+>>> Scenario DE 908 SKIPPED: sample_size_DE=77940 > cap=20000 (non realistico)
+>>> Scenario DE 909 SKIPPED: sample_size_DE=365700 > cap=20000 (non realistico)
+>>> Scenario DE 910 SKIPPED: sample_size_DE=365700 > cap=20000 (non realistico)
+>>> Scenario DE 911 SKIPPED: sample_size_DE=365700 > cap=20000 (non realistico)
+>>> Scenario DE 912 SKIPPED: sample_size_DE=365700 > cap=20000 (non realistico)
+>>> Scenario DE 913 SKIPPED: sample_size_DE=725400 > cap=20000 (non realistico)
+>>> Scenario DE 914 SKIPPED: sample_size_DE=725400 > cap=20000 (non realistico)
+>>> Scenario DE 915 SKIPPED: sample_size_DE=725400 > cap=20000 (non realistico)
+>>> Scenario DE 916 SKIPPED: sample_size_DE=725400 > cap=20000 (non realistico)
+>>> Scenario DE 917 SKIPPED: sample_size_DE=2164200 > cap=20000 (non realistico)
+>>> Scenario DE 918 SKIPPED: sample_size_DE=2164200 > cap=20000 (non realistico)
+>>> Scenario DE 919 SKIPPED: sample_size_DE=2164200 > cap=20000 (non realistico)
+>>> Scenario DE 920 SKIPPED: sample_size_DE=2164200 > cap=20000 (non realistico)
+>>> Scenario DE 925 SKIPPED: sample_size_DE=29940 > cap=20000 (non realistico)
+>>> Scenario DE 926 SKIPPED: sample_size_DE=29940 > cap=20000 (non realistico)
+>>> Scenario DE 927 SKIPPED: sample_size_DE=29940 > cap=20000 (non realistico)
+>>> Scenario DE 928 SKIPPED: sample_size_DE=29940 > cap=20000 (non realistico)
+>>> Scenario DE 929 SKIPPED: sample_size_DE=125701 > cap=20000 (non realistico)
+>>> Scenario DE 930 SKIPPED: sample_size_DE=125701 > cap=20000 (non realistico)
+>>> Scenario DE 931 SKIPPED: sample_size_DE=125701 > cap=20000 (non realistico)
+>>> Scenario DE 932 SKIPPED: sample_size_DE=125701 > cap=20000 (non realistico)
+>>> Scenario DE 933 SKIPPED: sample_size_DE=245401 > cap=20000 (non realistico)
+>>> Scenario DE 934 SKIPPED: sample_size_DE=245401 > cap=20000 (non realistico)
+>>> Scenario DE 935 SKIPPED: sample_size_DE=245401 > cap=20000 (non realistico)
+>>> Scenario DE 936 SKIPPED: sample_size_DE=245401 > cap=20000 (non realistico)
+>>> Scenario DE 937 SKIPPED: sample_size_DE=724200 > cap=20000 (non realistico)
+>>> Scenario DE 938 SKIPPED: sample_size_DE=724200 > cap=20000 (non realistico)
+>>> Scenario DE 939 SKIPPED: sample_size_DE=724200 > cap=20000 (non realistico)
+>>> Scenario DE 940 SKIPPED: sample_size_DE=724200 > cap=20000 (non realistico)
+>>> Scenario DE 949 SKIPPED: sample_size_DE=35700 > cap=20000 (non realistico)
+>>> Scenario DE 950 SKIPPED: sample_size_DE=35700 > cap=20000 (non realistico)
+>>> Scenario DE 951 SKIPPED: sample_size_DE=35700 > cap=20000 (non realistico)
+>>> Scenario DE 952 SKIPPED: sample_size_DE=35700 > cap=20000 (non realistico)
+>>> Scenario DE 953 SKIPPED: sample_size_DE=65400 > cap=20000 (non realistico)
+>>> Scenario DE 954 SKIPPED: sample_size_DE=65400 > cap=20000 (non realistico)
+>>> Scenario DE 955 SKIPPED: sample_size_DE=65400 > cap=20000 (non realistico)
+>>> Scenario DE 956 SKIPPED: sample_size_DE=65400 > cap=20000 (non realistico)
+>>> Scenario DE 957 SKIPPED: sample_size_DE=184200 > cap=20000 (non realistico)
+>>> Scenario DE 958 SKIPPED: sample_size_DE=184200 > cap=20000 (non realistico)
+>>> Scenario DE 959 SKIPPED: sample_size_DE=184200 > cap=20000 (non realistico)
+>>> Scenario DE 960 SKIPPED: sample_size_DE=184200 > cap=20000 (non realistico)
+
+--- Step 3: Combinazione risultati ---
+
+Salvato: results_optimized/paper2_power_individual/power_results_individual_FINAL.rds
+
+========== PAPER 2 POWER - DESIGN HOSPITAL ==========
+Scenari base: 960
+nsim per scenario: 1000
+
+--- Step 1: Calcolo power base ---
+>>> Power scenario 66 | icc=0.01, n=500, hosp=5, effect=-0.5
+>>> Power scenario 69 | icc=0.05, n=500, hosp=5, effect=-0.2
+>>> Power scenario 743 | icc=0.00, n=100, hosp=30, effect=-0.2
+>>> Power scenario 779 | icc=0.30, n=100, hosp=60, effect=-0.2
+>>> Power scenario 867 | icc=0.01, n=2000, hosp=30, effect=-0.2
+>>> Power scenario 917 | icc=0.30, n=6000, hosp=5, effect=-0.2
+
+--- Step 2: Calcolo power con sample size DE ---
+Scenari DE da processare: 768
+>>> Scenario DE 129 SKIPPED: sample_size_DE=41901 > cap=20000 (non realistico)
+>>> Scenario DE 130 SKIPPED: sample_size_DE=41901 > cap=20000 (non realistico)
+>>> Scenario DE 131 SKIPPED: sample_size_DE=41901 > cap=20000 (non realistico)
+>>> Scenario DE 132 SKIPPED: sample_size_DE=41901 > cap=20000 (non realistico)
+>>> Scenario DE 133 SKIPPED: sample_size_DE=81801 > cap=20000 (non realistico)
+>>> Scenario DE 134 SKIPPED: sample_size_DE=81801 > cap=20000 (non realistico)
+>>> Scenario DE 135 SKIPPED: sample_size_DE=81801 > cap=20000 (non realistico)
+>>> Scenario DE 136 SKIPPED: sample_size_DE=81801 > cap=20000 (non realistico)
+>>> Scenario DE 137 SKIPPED: sample_size_DE=241400 > cap=20000 (non realistico)
+>>> Scenario DE 138 SKIPPED: sample_size_DE=241400 > cap=20000 (non realistico)
+>>> Scenario DE 139 SKIPPED: sample_size_DE=241400 > cap=20000 (non realistico)
+>>> Scenario DE 140 SKIPPED: sample_size_DE=241400 > cap=20000 (non realistico)
+>>> Scenario DE 153 SKIPPED: sample_size_DE=28467 > cap=20000 (non realistico)
+>>> Scenario DE 154 SKIPPED: sample_size_DE=28467 > cap=20000 (non realistico)
+>>> Scenario DE 155 SKIPPED: sample_size_DE=28467 > cap=20000 (non realistico)
+>>> Scenario DE 156 SKIPPED: sample_size_DE=28467 > cap=20000 (non realistico)
+>>> Scenario DE 157 SKIPPED: sample_size_DE=81400 > cap=20000 (non realistico)
+>>> Scenario DE 158 SKIPPED: sample_size_DE=81400 > cap=20000 (non realistico)
+>>> Scenario DE 159 SKIPPED: sample_size_DE=81400 > cap=20000 (non realistico)
+>>> Scenario DE 160 SKIPPED: sample_size_DE=81400 > cap=20000 (non realistico)
+>>> Scenario DE 177 SKIPPED: sample_size_DE=21401 > cap=20000 (non realistico)
+>>> Scenario DE 178 SKIPPED: sample_size_DE=21401 > cap=20000 (non realistico)
+>>> Scenario DE 179 SKIPPED: sample_size_DE=21401 > cap=20000 (non realistico)
+>>> Scenario DE 180 SKIPPED: sample_size_DE=21401 > cap=20000 (non realistico)
+>>> Scenario DE 185 SKIPPED: sample_size_DE=77940 > cap=20000 (non realistico)
+>>> Scenario DE 186 SKIPPED: sample_size_DE=77940 > cap=20000 (non realistico)
+>>> Scenario DE 187 SKIPPED: sample_size_DE=77940 > cap=20000 (non realistico)
+>>> Scenario DE 188 SKIPPED: sample_size_DE=77940 > cap=20000 (non realistico)
+>>> Scenario DE 189 SKIPPED: sample_size_DE=365700 > cap=20000 (non realistico)
+>>> Scenario DE 190 SKIPPED: sample_size_DE=365700 > cap=20000 (non realistico)
+>>> Scenario DE 191 SKIPPED: sample_size_DE=365700 > cap=20000 (non realistico)
+>>> Scenario DE 192 SKIPPED: sample_size_DE=365700 > cap=20000 (non realistico)
+>>> Scenario DE 193 SKIPPED: sample_size_DE=725400 > cap=20000 (non realistico)
+>>> Scenario DE 194 SKIPPED: sample_size_DE=725400 > cap=20000 (non realistico)
+>>> Scenario DE 195 SKIPPED: sample_size_DE=725400 > cap=20000 (non realistico)
+>>> Scenario DE 196 SKIPPED: sample_size_DE=725400 > cap=20000 (non realistico)
+>>> Scenario DE 197 SKIPPED: sample_size_DE=2164200 > cap=20000 (non realistico)
+>>> Scenario DE 198 SKIPPED: sample_size_DE=2164200 > cap=20000 (non realistico)
+>>> Scenario DE 199 SKIPPED: sample_size_DE=2164200 > cap=20000 (non realistico)
+>>> Scenario DE 200 SKIPPED: sample_size_DE=2164200 > cap=20000 (non realistico)
+>>> Scenario DE 205 SKIPPED: sample_size_DE=29940 > cap=20000 (non realistico)
+>>> Scenario DE 206 SKIPPED: sample_size_DE=29940 > cap=20000 (non realistico)
+>>> Scenario DE 207 SKIPPED: sample_size_DE=29940 > cap=20000 (non realistico)
+>>> Scenario DE 208 SKIPPED: sample_size_DE=29940 > cap=20000 (non realistico)
+>>> Scenario DE 209 SKIPPED: sample_size_DE=125701 > cap=20000 (non realistico)
+>>> Scenario DE 210 SKIPPED: sample_size_DE=125701 > cap=20000 (non realistico)
+>>> Scenario DE 211 SKIPPED: sample_size_DE=125701 > cap=20000 (non realistico)
+>>> Scenario DE 212 SKIPPED: sample_size_DE=125701 > cap=20000 (non realistico)
+>>> Scenario DE 213 SKIPPED: sample_size_DE=245401 > cap=20000 (non realistico)
+>>> Scenario DE 214 SKIPPED: sample_size_DE=245401 > cap=20000 (non realistico)
+>>> Scenario DE 215 SKIPPED: sample_size_DE=245401 > cap=20000 (non realistico)
+>>> Scenario DE 216 SKIPPED: sample_size_DE=245401 > cap=20000 (non realistico)
+>>> Scenario DE 217 SKIPPED: sample_size_DE=724200 > cap=20000 (non realistico)
+>>> Scenario DE 218 SKIPPED: sample_size_DE=724200 > cap=20000 (non realistico)
+>>> Scenario DE 219 SKIPPED: sample_size_DE=724200 > cap=20000 (non realistico)
+>>> Scenario DE 220 SKIPPED: sample_size_DE=724200 > cap=20000 (non realistico)
+>>> Scenario DE 229 SKIPPED: sample_size_DE=35700 > cap=20000 (non realistico)
+>>> Scenario DE 230 SKIPPED: sample_size_DE=35700 > cap=20000 (non realistico)
+>>> Scenario DE 231 SKIPPED: sample_size_DE=35700 > cap=20000 (non realistico)
+>>> Scenario DE 232 SKIPPED: sample_size_DE=35700 > cap=20000 (non realistico)
+>>> Scenario DE 233 SKIPPED: sample_size_DE=65400 > cap=20000 (non realistico)
+>>> Scenario DE 234 SKIPPED: sample_size_DE=65400 > cap=20000 (non realistico)
+>>> Scenario DE 235 SKIPPED: sample_size_DE=65400 > cap=20000 (non realistico)
+>>> Scenario DE 236 SKIPPED: sample_size_DE=65400 > cap=20000 (non realistico)
+>>> Scenario DE 237 SKIPPED: sample_size_DE=184200 > cap=20000 (non realistico)
+>>> Scenario DE 238 SKIPPED: sample_size_DE=184200 > cap=20000 (non realistico)
+>>> Scenario DE 239 SKIPPED: sample_size_DE=184200 > cap=20000 (non realistico)
+>>> Scenario DE 240 SKIPPED: sample_size_DE=184200 > cap=20000 (non realistico)
+>>> Scenario DE 369 SKIPPED: sample_size_DE=41901 > cap=20000 (non realistico)
+>>> Scenario DE 370 SKIPPED: sample_size_DE=41901 > cap=20000 (non realistico)
+>>> Scenario DE 371 SKIPPED: sample_size_DE=41901 > cap=20000 (non realistico)
+>>> Scenario DE 372 SKIPPED: sample_size_DE=41901 > cap=20000 (non realistico)
+>>> Scenario DE 373 SKIPPED: sample_size_DE=81801 > cap=20000 (non realistico)
+>>> Scenario DE 374 SKIPPED: sample_size_DE=81801 > cap=20000 (non realistico)
+>>> Scenario DE 375 SKIPPED: sample_size_DE=81801 > cap=20000 (non realistico)
+>>> Scenario DE 376 SKIPPED: sample_size_DE=81801 > cap=20000 (non realistico)
+>>> Scenario DE 377 SKIPPED: sample_size_DE=241400 > cap=20000 (non realistico)
+>>> Scenario DE 378 SKIPPED: sample_size_DE=241400 > cap=20000 (non realistico)
+>>> Scenario DE 379 SKIPPED: sample_size_DE=241400 > cap=20000 (non realistico)
+>>> Scenario DE 380 SKIPPED: sample_size_DE=241400 > cap=20000 (non realistico)
+>>> Scenario DE 393 SKIPPED: sample_size_DE=28467 > cap=20000 (non realistico)
+>>> Scenario DE 394 SKIPPED: sample_size_DE=28467 > cap=20000 (non realistico)
+>>> Scenario DE 395 SKIPPED: sample_size_DE=28467 > cap=20000 (non realistico)
+>>> Scenario DE 396 SKIPPED: sample_size_DE=28467 > cap=20000 (non realistico)
+>>> Scenario DE 397 SKIPPED: sample_size_DE=81400 > cap=20000 (non realistico)
+>>> Scenario DE 398 SKIPPED: sample_size_DE=81400 > cap=20000 (non realistico)
+>>> Scenario DE 399 SKIPPED: sample_size_DE=81400 > cap=20000 (non realistico)
+>>> Scenario DE 400 SKIPPED: sample_size_DE=81400 > cap=20000 (non realistico)
+>>> Scenario DE 417 SKIPPED: sample_size_DE=21401 > cap=20000 (non realistico)
+>>> Scenario DE 418 SKIPPED: sample_size_DE=21401 > cap=20000 (non realistico)
+>>> Scenario DE 419 SKIPPED: sample_size_DE=21401 > cap=20000 (non realistico)
+>>> Scenario DE 420 SKIPPED: sample_size_DE=21401 > cap=20000 (non realistico)
+>>> Scenario DE 425 SKIPPED: sample_size_DE=77940 > cap=20000 (non realistico)
+>>> Scenario DE 426 SKIPPED: sample_size_DE=77940 > cap=20000 (non realistico)
+>>> Scenario DE 427 SKIPPED: sample_size_DE=77940 > cap=20000 (non realistico)
+>>> Scenario DE 428 SKIPPED: sample_size_DE=77940 > cap=20000 (non realistico)
+>>> Scenario DE 429 SKIPPED: sample_size_DE=365700 > cap=20000 (non realistico)
+>>> Scenario DE 430 SKIPPED: sample_size_DE=365700 > cap=20000 (non realistico)
+>>> Scenario DE 431 SKIPPED: sample_size_DE=365700 > cap=20000 (non realistico)
+>>> Scenario DE 432 SKIPPED: sample_size_DE=365700 > cap=20000 (non realistico)
+>>> Scenario DE 433 SKIPPED: sample_size_DE=725400 > cap=20000 (non realistico)
+>>> Scenario DE 434 SKIPPED: sample_size_DE=725400 > cap=20000 (non realistico)
+>>> Scenario DE 435 SKIPPED: sample_size_DE=725400 > cap=20000 (non realistico)
+>>> Scenario DE 436 SKIPPED: sample_size_DE=725400 > cap=20000 (non realistico)
+>>> Scenario DE 437 SKIPPED: sample_size_DE=2164200 > cap=20000 (non realistico)
+>>> Scenario DE 438 SKIPPED: sample_size_DE=2164200 > cap=20000 (non realistico)
+>>> Scenario DE 439 SKIPPED: sample_size_DE=2164200 > cap=20000 (non realistico)
+>>> Scenario DE 440 SKIPPED: sample_size_DE=2164200 > cap=20000 (non realistico)
+>>> Scenario DE 445 SKIPPED: sample_size_DE=29940 > cap=20000 (non realistico)
+>>> Scenario DE 446 SKIPPED: sample_size_DE=29940 > cap=20000 (non realistico)
+>>> Scenario DE 447 SKIPPED: sample_size_DE=29940 > cap=20000 (non realistico)
+>>> Scenario DE 448 SKIPPED: sample_size_DE=29940 > cap=20000 (non realistico)
+>>> Scenario DE 449 SKIPPED: sample_size_DE=125701 > cap=20000 (non realistico)
+>>> Scenario DE 450 SKIPPED: sample_size_DE=125701 > cap=20000 (non realistico)
+>>> Scenario DE 451 SKIPPED: sample_size_DE=125701 > cap=20000 (non realistico)
+>>> Scenario DE 452 SKIPPED: sample_size_DE=125701 > cap=20000 (non realistico)
+>>> Scenario DE 453 SKIPPED: sample_size_DE=245401 > cap=20000 (non realistico)
+>>> Scenario DE 454 SKIPPED: sample_size_DE=245401 > cap=20000 (non realistico)
+>>> Scenario DE 455 SKIPPED: sample_size_DE=245401 > cap=20000 (non realistico)
+>>> Scenario DE 456 SKIPPED: sample_size_DE=245401 > cap=20000 (non realistico)
+>>> Scenario DE 457 SKIPPED: sample_size_DE=724200 > cap=20000 (non realistico)
+>>> Scenario DE 458 SKIPPED: sample_size_DE=724200 > cap=20000 (non realistico)
+>>> Scenario DE 459 SKIPPED: sample_size_DE=724200 > cap=20000 (non realistico)
+>>> Scenario DE 460 SKIPPED: sample_size_DE=724200 > cap=20000 (non realistico)
+>>> Scenario DE 469 SKIPPED: sample_size_DE=35700 > cap=20000 (non realistico)
+>>> Scenario DE 470 SKIPPED: sample_size_DE=35700 > cap=20000 (non realistico)
+>>> Scenario DE 471 SKIPPED: sample_size_DE=35700 > cap=20000 (non realistico)
+>>> Scenario DE 472 SKIPPED: sample_size_DE=35700 > cap=20000 (non realistico)
+>>> Scenario DE 473 SKIPPED: sample_size_DE=65400 > cap=20000 (non realistico)
+>>> Scenario DE 474 SKIPPED: sample_size_DE=65400 > cap=20000 (non realistico)
+>>> Scenario DE 475 SKIPPED: sample_size_DE=65400 > cap=20000 (non realistico)
+>>> Scenario DE 476 SKIPPED: sample_size_DE=65400 > cap=20000 (non realistico)
+>>> Scenario DE 477 SKIPPED: sample_size_DE=184200 > cap=20000 (non realistico)
+>>> Scenario DE 478 SKIPPED: sample_size_DE=184200 > cap=20000 (non realistico)
+>>> Scenario DE 479 SKIPPED: sample_size_DE=184200 > cap=20000 (non realistico)
+>>> Scenario DE 480 SKIPPED: sample_size_DE=184200 > cap=20000 (non realistico)
+>>> Power DE scenario 525 | icc=0.01, n_DE=101
+>>> Power DE scenario 526 | icc=0.01, n_DE=101
+>>> Power DE scenario 527 | icc=0.01, n_DE=101
+>>> Power DE scenario 528 | icc=0.01, n_DE=101
+>>> Power DE scenario 529 | icc=0.05, n_DE=104
+>>> Power DE scenario 530 | icc=0.05, n_DE=104
+>>> Power DE scenario 531 | icc=0.05, n_DE=104
+>>> Power DE scenario 532 | icc=0.05, n_DE=104
+>>> Power DE scenario 533 | icc=0.10, n_DE=107
+>>> Power DE scenario 534 | icc=0.10, n_DE=107
+>>> Power DE scenario 535 | icc=0.10, n_DE=107
+>>> Power DE scenario 536 | icc=0.10, n_DE=107
+>>> Power DE scenario 537 | icc=0.30, n_DE=120
+>>> Power DE scenario 538 | icc=0.30, n_DE=120
+>>> Power DE scenario 539 | icc=0.30, n_DE=120
+>>> Power DE scenario 540 | icc=0.30, n_DE=120
+>>> Power DE scenario 552 | icc=0.05, n_DE=2975
+>>> Scenario DE 609 SKIPPED: sample_size_DE=41901 > cap=20000 (non realistico)
+>>> Scenario DE 610 SKIPPED: sample_size_DE=41901 > cap=20000 (non realistico)
+>>> Scenario DE 611 SKIPPED: sample_size_DE=41901 > cap=20000 (non realistico)
+>>> Scenario DE 612 SKIPPED: sample_size_DE=41901 > cap=20000 (non realistico)
+>>> Scenario DE 613 SKIPPED: sample_size_DE=81801 > cap=20000 (non realistico)
+>>> Scenario DE 614 SKIPPED: sample_size_DE=81801 > cap=20000 (non realistico)
+>>> Scenario DE 615 SKIPPED: sample_size_DE=81801 > cap=20000 (non realistico)
+>>> Scenario DE 616 SKIPPED: sample_size_DE=81801 > cap=20000 (non realistico)
+>>> Scenario DE 617 SKIPPED: sample_size_DE=241400 > cap=20000 (non realistico)
+>>> Scenario DE 618 SKIPPED: sample_size_DE=241400 > cap=20000 (non realistico)
+>>> Scenario DE 619 SKIPPED: sample_size_DE=241400 > cap=20000 (non realistico)
+>>> Scenario DE 620 SKIPPED: sample_size_DE=241400 > cap=20000 (non realistico)
+>>> Scenario DE 633 SKIPPED: sample_size_DE=28467 > cap=20000 (non realistico)
+>>> Scenario DE 634 SKIPPED: sample_size_DE=28467 > cap=20000 (non realistico)
+>>> Scenario DE 635 SKIPPED: sample_size_DE=28467 > cap=20000 (non realistico)
+>>> Scenario DE 636 SKIPPED: sample_size_DE=28467 > cap=20000 (non realistico)
+>>> Scenario DE 637 SKIPPED: sample_size_DE=81400 > cap=20000 (non realistico)
+>>> Scenario DE 638 SKIPPED: sample_size_DE=81400 > cap=20000 (non realistico)
+>>> Scenario DE 639 SKIPPED: sample_size_DE=81400 > cap=20000 (non realistico)
+>>> Scenario DE 640 SKIPPED: sample_size_DE=81400 > cap=20000 (non realistico)
+>>> Scenario DE 657 SKIPPED: sample_size_DE=21401 > cap=20000 (non realistico)
+>>> Scenario DE 658 SKIPPED: sample_size_DE=21401 > cap=20000 (non realistico)
+>>> Scenario DE 659 SKIPPED: sample_size_DE=21401 > cap=20000 (non realistico)
+>>> Scenario DE 660 SKIPPED: sample_size_DE=21401 > cap=20000 (non realistico)
+>>> Scenario DE 665 SKIPPED: sample_size_DE=77940 > cap=20000 (non realistico)
+>>> Scenario DE 666 SKIPPED: sample_size_DE=77940 > cap=20000 (non realistico)
+>>> Scenario DE 667 SKIPPED: sample_size_DE=77940 > cap=20000 (non realistico)
+>>> Scenario DE 668 SKIPPED: sample_size_DE=77940 > cap=20000 (non realistico)
+>>> Scenario DE 669 SKIPPED: sample_size_DE=365700 > cap=20000 (non realistico)
+>>> Scenario DE 670 SKIPPED: sample_size_DE=365700 > cap=20000 (non realistico)
+>>> Scenario DE 671 SKIPPED: sample_size_DE=365700 > cap=20000 (non realistico)
+>>> Scenario DE 672 SKIPPED: sample_size_DE=365700 > cap=20000 (non realistico)
+>>> Scenario DE 673 SKIPPED: sample_size_DE=725400 > cap=20000 (non realistico)
+>>> Scenario DE 674 SKIPPED: sample_size_DE=725400 > cap=20000 (non realistico)
+>>> Scenario DE 675 SKIPPED: sample_size_DE=725400 > cap=20000 (non realistico)
+>>> Scenario DE 676 SKIPPED: sample_size_DE=725400 > cap=20000 (non realistico)
+>>> Scenario DE 677 SKIPPED: sample_size_DE=2164200 > cap=20000 (non realistico)
+>>> Scenario DE 678 SKIPPED: sample_size_DE=2164200 > cap=20000 (non realistico)
+>>> Scenario DE 679 SKIPPED: sample_size_DE=2164200 > cap=20000 (non realistico)
+>>> Scenario DE 680 SKIPPED: sample_size_DE=2164200 > cap=20000 (non realistico)
+>>> Scenario DE 685 SKIPPED: sample_size_DE=29940 > cap=20000 (non realistico)
+>>> Scenario DE 686 SKIPPED: sample_size_DE=29940 > cap=20000 (non realistico)
+>>> Scenario DE 687 SKIPPED: sample_size_DE=29940 > cap=20000 (non realistico)
+>>> Scenario DE 688 SKIPPED: sample_size_DE=29940 > cap=20000 (non realistico)
+>>> Scenario DE 689 SKIPPED: sample_size_DE=125701 > cap=20000 (non realistico)
+>>> Scenario DE 690 SKIPPED: sample_size_DE=125701 > cap=20000 (non realistico)
+>>> Scenario DE 691 SKIPPED: sample_size_DE=125701 > cap=20000 (non realistico)
+>>> Scenario DE 692 SKIPPED: sample_size_DE=125701 > cap=20000 (non realistico)
+>>> Scenario DE 693 SKIPPED: sample_size_DE=245401 > cap=20000 (non realistico)
+>>> Scenario DE 694 SKIPPED: sample_size_DE=245401 > cap=20000 (non realistico)
+>>> Scenario DE 695 SKIPPED: sample_size_DE=245401 > cap=20000 (non realistico)
+>>> Scenario DE 696 SKIPPED: sample_size_DE=245401 > cap=20000 (non realistico)
+>>> Scenario DE 697 SKIPPED: sample_size_DE=724200 > cap=20000 (non realistico)
+>>> Scenario DE 698 SKIPPED: sample_size_DE=724200 > cap=20000 (non realistico)
+>>> Scenario DE 699 SKIPPED: sample_size_DE=724200 > cap=20000 (non realistico)
+>>> Scenario DE 700 SKIPPED: sample_size_DE=724200 > cap=20000 (non realistico)
+>>> Scenario DE 709 SKIPPED: sample_size_DE=35700 > cap=20000 (non realistico)
+>>> Scenario DE 710 SKIPPED: sample_size_DE=35700 > cap=20000 (non realistico)
+>>> Scenario DE 711 SKIPPED: sample_size_DE=35700 > cap=20000 (non realistico)
+>>> Scenario DE 712 SKIPPED: sample_size_DE=35700 > cap=20000 (non realistico)
+>>> Scenario DE 713 SKIPPED: sample_size_DE=65400 > cap=20000 (non realistico)
+>>> Scenario DE 714 SKIPPED: sample_size_DE=65400 > cap=20000 (non realistico)
+>>> Scenario DE 715 SKIPPED: sample_size_DE=65400 > cap=20000 (non realistico)
+>>> Scenario DE 716 SKIPPED: sample_size_DE=65400 > cap=20000 (non realistico)
+>>> Scenario DE 717 SKIPPED: sample_size_DE=184200 > cap=20000 (non realistico)
+>>> Scenario DE 718 SKIPPED: sample_size_DE=184200 > cap=20000 (non realistico)
+>>> Scenario DE 719 SKIPPED: sample_size_DE=184200 > cap=20000 (non realistico)
+>>> Scenario DE 720 SKIPPED: sample_size_DE=184200 > cap=20000 (non realistico)
+>>> Power DE scenario 765 | icc=0.01, n_DE=101
+>>> Power DE scenario 766 | icc=0.01, n_DE=101
+>>> Power DE scenario 767 | icc=0.01, n_DE=101
+>>> Power DE scenario 768 | icc=0.01, n_DE=101
+>>> Power DE scenario 769 | icc=0.05, n_DE=104
+>>> Power DE scenario 770 | icc=0.05, n_DE=104
+>>> Power DE scenario 771 | icc=0.05, n_DE=104
+>>> Power DE scenario 772 | icc=0.05, n_DE=104
+>>> Power DE scenario 773 | icc=0.10, n_DE=107
+>>> Power DE scenario 774 | icc=0.10, n_DE=107
+>>> Power DE scenario 775 | icc=0.10, n_DE=107
+>>> Power DE scenario 776 | icc=0.10, n_DE=107
+>>> Power DE scenario 777 | icc=0.30, n_DE=120
+>>> Power DE scenario 778 | icc=0.30, n_DE=120
+>>> Power DE scenario 779 | icc=0.30, n_DE=120
+>>> Power DE scenario 780 | icc=0.30, n_DE=120
+>>> Scenario DE 849 SKIPPED: sample_size_DE=41901 > cap=20000 (non realistico)
+>>> Scenario DE 850 SKIPPED: sample_size_DE=41901 > cap=20000 (non realistico)
+>>> Scenario DE 851 SKIPPED: sample_size_DE=41901 > cap=20000 (non realistico)
+>>> Scenario DE 852 SKIPPED: sample_size_DE=41901 > cap=20000 (non realistico)
+>>> Scenario DE 853 SKIPPED: sample_size_DE=81801 > cap=20000 (non realistico)
+>>> Scenario DE 854 SKIPPED: sample_size_DE=81801 > cap=20000 (non realistico)
+>>> Scenario DE 855 SKIPPED: sample_size_DE=81801 > cap=20000 (non realistico)
+>>> Scenario DE 856 SKIPPED: sample_size_DE=81801 > cap=20000 (non realistico)
+>>> Scenario DE 857 SKIPPED: sample_size_DE=241400 > cap=20000 (non realistico)
+>>> Scenario DE 858 SKIPPED: sample_size_DE=241400 > cap=20000 (non realistico)
+>>> Scenario DE 859 SKIPPED: sample_size_DE=241400 > cap=20000 (non realistico)
+>>> Scenario DE 860 SKIPPED: sample_size_DE=241400 > cap=20000 (non realistico)
+>>> Power DE scenario 867 | icc=0.01, n_DE=3314
+>>> Scenario DE 873 SKIPPED: sample_size_DE=28467 > cap=20000 (non realistico)
+>>> Scenario DE 874 SKIPPED: sample_size_DE=28467 > cap=20000 (non realistico)
+>>> Scenario DE 875 SKIPPED: sample_size_DE=28467 > cap=20000 (non realistico)
+>>> Scenario DE 876 SKIPPED: sample_size_DE=28467 > cap=20000 (non realistico)
+>>> Scenario DE 877 SKIPPED: sample_size_DE=81400 > cap=20000 (non realistico)
+>>> Scenario DE 878 SKIPPED: sample_size_DE=81400 > cap=20000 (non realistico)
+>>> Scenario DE 879 SKIPPED: sample_size_DE=81400 > cap=20000 (non realistico)
+>>> Scenario DE 880 SKIPPED: sample_size_DE=81400 > cap=20000 (non realistico)
+>>> Scenario DE 897 SKIPPED: sample_size_DE=21401 > cap=20000 (non realistico)
+>>> Scenario DE 898 SKIPPED: sample_size_DE=21401 > cap=20000 (non realistico)
+>>> Scenario DE 899 SKIPPED: sample_size_DE=21401 > cap=20000 (non realistico)
+>>> Scenario DE 900 SKIPPED: sample_size_DE=21401 > cap=20000 (non realistico)
+>>> Scenario DE 905 SKIPPED: sample_size_DE=77940 > cap=20000 (non realistico)
+>>> Scenario DE 906 SKIPPED: sample_size_DE=77940 > cap=20000 (non realistico)
+>>> Scenario DE 907 SKIPPED: sample_size_DE=77940 > cap=20000 (non realistico)
+>>> Scenario DE 908 SKIPPED: sample_size_DE=77940 > cap=20000 (non realistico)
+>>> Scenario DE 909 SKIPPED: sample_size_DE=365700 > cap=20000 (non realistico)
+>>> Scenario DE 910 SKIPPED: sample_size_DE=365700 > cap=20000 (non realistico)
+>>> Scenario DE 911 SKIPPED: sample_size_DE=365700 > cap=20000 (non realistico)
+>>> Scenario DE 912 SKIPPED: sample_size_DE=365700 > cap=20000 (non realistico)
+>>> Scenario DE 913 SKIPPED: sample_size_DE=725400 > cap=20000 (non realistico)
+>>> Scenario DE 914 SKIPPED: sample_size_DE=725400 > cap=20000 (non realistico)
+>>> Scenario DE 915 SKIPPED: sample_size_DE=725400 > cap=20000 (non realistico)
+>>> Scenario DE 916 SKIPPED: sample_size_DE=725400 > cap=20000 (non realistico)
+>>> Scenario DE 917 SKIPPED: sample_size_DE=2164200 > cap=20000 (non realistico)
+>>> Scenario DE 918 SKIPPED: sample_size_DE=2164200 > cap=20000 (non realistico)
+>>> Scenario DE 919 SKIPPED: sample_size_DE=2164200 > cap=20000 (non realistico)
+>>> Scenario DE 920 SKIPPED: sample_size_DE=2164200 > cap=20000 (non realistico)
+>>> Scenario DE 925 SKIPPED: sample_size_DE=29940 > cap=20000 (non realistico)
+>>> Scenario DE 926 SKIPPED: sample_size_DE=29940 > cap=20000 (non realistico)
+>>> Scenario DE 927 SKIPPED: sample_size_DE=29940 > cap=20000 (non realistico)
+>>> Scenario DE 928 SKIPPED: sample_size_DE=29940 > cap=20000 (non realistico)
+>>> Scenario DE 929 SKIPPED: sample_size_DE=125701 > cap=20000 (non realistico)
+>>> Scenario DE 930 SKIPPED: sample_size_DE=125701 > cap=20000 (non realistico)
+>>> Scenario DE 931 SKIPPED: sample_size_DE=125701 > cap=20000 (non realistico)
+>>> Scenario DE 932 SKIPPED: sample_size_DE=125701 > cap=20000 (non realistico)
+>>> Scenario DE 933 SKIPPED: sample_size_DE=245401 > cap=20000 (non realistico)
+>>> Scenario DE 934 SKIPPED: sample_size_DE=245401 > cap=20000 (non realistico)
+>>> Scenario DE 935 SKIPPED: sample_size_DE=245401 > cap=20000 (non realistico)
+>>> Scenario DE 936 SKIPPED: sample_size_DE=245401 > cap=20000 (non realistico)
+>>> Scenario DE 937 SKIPPED: sample_size_DE=724200 > cap=20000 (non realistico)
+>>> Scenario DE 938 SKIPPED: sample_size_DE=724200 > cap=20000 (non realistico)
+>>> Scenario DE 939 SKIPPED: sample_size_DE=724200 > cap=20000 (non realistico)
+>>> Scenario DE 940 SKIPPED: sample_size_DE=724200 > cap=20000 (non realistico)
+>>> Scenario DE 949 SKIPPED: sample_size_DE=35700 > cap=20000 (non realistico)
+>>> Scenario DE 950 SKIPPED: sample_size_DE=35700 > cap=20000 (non realistico)
+>>> Scenario DE 951 SKIPPED: sample_size_DE=35700 > cap=20000 (non realistico)
+>>> Scenario DE 952 SKIPPED: sample_size_DE=35700 > cap=20000 (non realistico)
+>>> Scenario DE 953 SKIPPED: sample_size_DE=65400 > cap=20000 (non realistico)
+>>> Scenario DE 954 SKIPPED: sample_size_DE=65400 > cap=20000 (non realistico)
+>>> Scenario DE 955 SKIPPED: sample_size_DE=65400 > cap=20000 (non realistico)
+>>> Scenario DE 956 SKIPPED: sample_size_DE=65400 > cap=20000 (non realistico)
+>>> Scenario DE 957 SKIPPED: sample_size_DE=184200 > cap=20000 (non realistico)
+>>> Scenario DE 958 SKIPPED: sample_size_DE=184200 > cap=20000 (non realistico)
+>>> Scenario DE 959 SKIPPED: sample_size_DE=184200 > cap=20000 (non realistico)
+>>> Scenario DE 960 SKIPPED: sample_size_DE=184200 > cap=20000 (non realistico)
+
+--- Step 3: Combinazione risultati ---
+
+Salvato: results_optimized/paper2_power_hospital/power_results_hospital_FINAL.rds
+
+
+Tutti i risultati Paper 2 Power salvati.
